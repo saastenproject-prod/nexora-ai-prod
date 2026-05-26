@@ -1,0 +1,44 @@
+
+[functions.widget-message]
+enabled = true
+verify_jwt = true
+import_map = "./functions/widget-message/deno.json"
+# Uncomment to specify a custom file path to the entrypoint.
+# Supported file extensions are: .ts, .js, .mjs, .jsx, .tsx
+entrypoint = "./functions/widget-message/index.ts"
+# Specifies static files to be bundled with the function. Supports glob patterns.
+# For example, if you want to serve static HTML pages in your function:
+# static_files = [ "./functions/widget-message/*.html" ]
+
+[functions.widget-fetch-messages]
+enabled = true
+verify_jwt = true
+import_map = "./functions/widget-fetch-messages/deno.json"
+# Uncomment to specify a custom file path to the entrypoint.
+# Supported file extensions are: .ts, .js, .mjs, .jsx, .tsx
+entrypoint = "./functions/widget-fetch-messages/index.ts"
+# Specifies static files to be bundled with the function. Supports glob patterns.
+# For example, if you want to serve static HTML pages in your function:
+# static_files = [ "./functions/widget-fetch-messages/*.html" ]
+
+[functions.widget-config]
+enabled = true
+verify_jwt = true
+import_map = "./functions/widget-config/deno.json"
+# Uncomment to specify a custom file path to the entrypoint.
+# Supported file extensions are: .ts, .js, .mjs, .jsx, .tsx
+entrypoint = "./functions/widget-config/index.ts"
+# Specifies static files to be bundled with the function. Supports glob patterns.
+# For example, if you want to serve static HTML pages in your function:
+# static_files = [ "./functions/widget-config/*.html" ]
+
+[functions.widget-ai-reply]
+enabled = true
+verify_jwt = false
+import_map = "./functions/widget-ai-reply/deno.json"
+# Uncomment to specify a custom file path to the entrypoint.
+# Supported file extensions are: .ts, .js, .mjs, .jsx, .tsx
+entrypoint = "./functions/widget-ai-reply/index.ts"
+# Specifies static files to be bundled with the function. Supports glob patterns.
+# For example, if you want to serve static HTML pages in your function:
+# static_files = [ "./functions/widget-ai-reply/*.html" ]
