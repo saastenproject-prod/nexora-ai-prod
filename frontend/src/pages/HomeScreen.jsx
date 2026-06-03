@@ -9,11 +9,14 @@ import {
   Search,
   Workflow,
   Zap,
-} from "../lib/icons";
+  AlertTriangle,
+  Clock3,
+  Smile,
+} from '../lib/icons';
 
-import { APP_NAME } from "../data/dummyData";
-import useDashboardData from "../hooks/useDashboardData";
-import AccountMenu from "../components/layout/AccountMenu";
+import { APP_NAME } from '../data/dummyData';
+import useDashboardData from '../hooks/useDashboardData';
+import AccountMenu from '../components/layout/AccountMenu';
 
 export default function HomeScreen({ setScreen, onLogout }) {
   const { loading, error, workspace, activeBot, stats, refetch } =
@@ -21,49 +24,67 @@ export default function HomeScreen({ setScreen, onLogout }) {
 
   const dashboardCards = [
     {
-      label: "Total Bots",
-      value: loading ? "..." : stats.totalBots,
-      note: loading ? "Loading..." : `${stats.activeBots} active`,
+      label: 'Total Bots',
+      value: loading ? '...' : stats.totalBots,
+      note: loading ? 'Loading...' : `${stats.activeBots} active`,
       icon: Bot,
     },
     {
-      label: "Conversations",
-      value: loading ? "..." : stats.conversations,
-      note: "Total conversations",
+      label: 'Conversations',
+      value: loading ? '...' : stats.conversations,
+      note: 'Total conversations',
       icon: MessageCircle,
     },
     {
-      label: "Automation Rate",
-      value: loading ? "..." : "72%",
-      note: "Handled by bot",
+      label: 'Automation Rate',
+      value: loading ? '...' : '72%',
+      note: 'Handled by bot',
       icon: BrainCircuit,
     },
     {
-      label: "Need Response",
-      value: loading ? "..." : stats.needResponse,
-      note: "Open / assigned inbox",
+      label: 'Need Response',
+      value: loading ? '...' : stats.needResponse,
+      note: 'Open / assigned inbox',
       icon: Inbox,
+    },
+    {
+      label: 'Failed Response',
+      value: loading ? '...' : '120',
+      note: 'Unsolved by bot',
+      icon: AlertTriangle,
+    },
+    {
+      label: 'Average Response Time',
+      value: loading ? '...' : '2m 10s',
+      note: 'Response time',
+      icon: Clock3,
+    },
+    {
+      label: 'User Satisfaction',
+      value: loading ? '...' : '85%',
+      note: 'User satisfaction score',
+      icon: Smile,
     },
   ];
 
   const recentFlows = [
     {
-      name: "Answer Customer Queries",
-      channel: "Website / WhatsApp",
-      status: "Published",
-      nodes: "7 nodes",
+      name: 'Answer Customer Queries',
+      channel: 'Website / WhatsApp',
+      status: 'Published',
+      nodes: '7 nodes',
     },
     {
-      name: "Lead Qualification",
-      channel: "Website",
-      status: "Draft",
-      nodes: "9 nodes",
+      name: 'Lead Qualification',
+      channel: 'Website',
+      status: 'Draft',
+      nodes: '9 nodes',
     },
     {
-      name: "WhatsApp Support Intake",
-      channel: "WhatsApp",
-      status: "Published",
-      nodes: "11 nodes",
+      name: 'WhatsApp Support Intake',
+      channel: 'WhatsApp',
+      status: 'Published',
+      nodes: '11 nodes',
     },
   ];
 
@@ -93,7 +114,7 @@ export default function HomeScreen({ setScreen, onLogout }) {
               <Bell size={17} />
             </button>
 
-          <AccountMenu workspaceName={workspace?.name} onLogout={onLogout} />
+            <AccountMenu workspaceName={workspace?.name} onLogout={onLogout} />
           </div>
         </div>
       </div>
@@ -131,20 +152,19 @@ export default function HomeScreen({ setScreen, onLogout }) {
               Refresh Data
             </button>
 
-           <button
-              onClick={() => setScreen("agent-marketplace")}
+            <button
+              onClick={() => setScreen('agent-marketplace')}
               className="h-11 px-5 rounded-2xl bg-blue-600 text-white text-sm font-bold shadow-sm hover:bg-blue-700 transition flex items-center gap-2"
             >
               <Plus size={17} /> Create Chatbot
             </button>
 
             <button
-              onClick={() => setScreen("builder")}
+              onClick={() => setScreen('builder')}
               className="h-11 px-5 rounded-2xl border border-slate-200 bg-white text-slate-700 text-sm font-bold hover:bg-slate-50 transition flex items-center gap-2"
             >
               <Workflow size={17} /> Open Builder
             </button>
-
           </div>
         </section>
 
@@ -188,12 +208,12 @@ export default function HomeScreen({ setScreen, onLogout }) {
                 <p className="mt-1 text-sm text-slate-500">
                   {workspace
                     ? `${workspace.name} · ${workspace.plan} plan`
-                    : "No active workspace found"}
+                    : 'No active workspace found'}
                 </p>
               </div>
 
               <span className="rounded-full bg-emerald-50 px-4 py-2 text-xs font-black text-emerald-700">
-                {workspace?.status || "inactive"}
+                {workspace?.status || 'inactive'}
               </span>
             </div>
 
@@ -207,24 +227,24 @@ export default function HomeScreen({ setScreen, onLogout }) {
                   </div>
 
                   <h3 className="mt-6 text-3xl font-black tracking-tight">
-                    {activeBot?.name || "No active bot"}
+                    {activeBot?.name || 'No active bot'}
                   </h3>
 
                   <p className="mt-3 text-blue-100 leading-7 max-w-xl">
                     {activeBot?.description ||
-                      "Automate FAQ, capture issue details, and hand off complex conversations to agents."}
+                      'Automate FAQ, capture issue details, and hand off complex conversations to agents.'}
                   </p>
 
                   <div className="mt-7 flex gap-3">
                     <button
-                      onClick={() => setScreen("builder")}
+                      onClick={() => setScreen('builder')}
                       className="h-11 px-5 rounded-2xl bg-white text-slate-950 text-sm font-black"
                     >
                       Edit Flow
                     </button>
 
                     <button
-                      onClick={() => setScreen("install")}
+                      onClick={() => setScreen('install')}
                       className="h-11 px-5 rounded-2xl border border-white/20 bg-white/10 text-white text-sm font-black"
                     >
                       Install Widget
@@ -241,7 +261,7 @@ export default function HomeScreen({ setScreen, onLogout }) {
 
                   <div className="mt-3 flex items-end justify-between">
                     <p className="text-2xl font-black text-slate-950 capitalize">
-                      {workspace?.plan || "Free"}
+                      {workspace?.plan || 'Free'}
                     </p>
                     <button className="text-sm font-black text-blue-700">
                       Upgrade
@@ -258,7 +278,7 @@ export default function HomeScreen({ setScreen, onLogout }) {
                     <div className="flex justify-between">
                       <span className="text-slate-500">Bot Status</span>
                       <span className="font-black text-emerald-600 capitalize">
-                        {activeBot?.status || "inactive"}
+                        {activeBot?.status || 'inactive'}
                       </span>
                     </div>
 
@@ -296,23 +316,23 @@ export default function HomeScreen({ setScreen, onLogout }) {
             <div className="mt-5 space-y-3">
               {[
                 {
-                  title: "Create Chatbot",
-                  desc: "Start from agent template.",
+                  title: 'Create Chatbot',
+                  desc: 'Start from agent template.',
                   icon: Plus,
-                  action: () => setScreen("agent-marketplace"),
+                  action: () => setScreen('agent-marketplace'),
                   primary: true,
                 },
                 {
-                  title: "Review Inbox",
-                  desc: "Handle customer handoff conversations.",
+                  title: 'Review Inbox',
+                  desc: 'Handle customer handoff conversations.',
                   icon: Inbox,
-                  action: () => setScreen("inbox"),
+                  action: () => setScreen('inbox'),
                 },
                 {
-                  title: "Install Widget",
-                  desc: "Copy script and publish to website.",
+                  title: 'Install Widget',
+                  desc: 'Copy script and publish to website.',
                   icon: Globe2,
-                  action: () => setScreen("install"),
+                  action: () => setScreen('install'),
                 },
               ].map((item) => {
                 const Icon = item.icon;
@@ -326,8 +346,8 @@ export default function HomeScreen({ setScreen, onLogout }) {
                     <div
                       className={`h-10 w-10 rounded-xl grid place-items-center ${
                         item.primary
-                          ? "bg-blue-600 text-white"
-                          : "bg-slate-100 text-slate-700"
+                          ? 'bg-blue-600 text-white'
+                          : 'bg-slate-100 text-slate-700'
                       }`}
                     >
                       <Icon size={18} />
@@ -361,7 +381,7 @@ export default function HomeScreen({ setScreen, onLogout }) {
               </div>
 
               <button
-                onClick={() => setScreen("flows")}
+                onClick={() => setScreen('flows')}
                 className="h-10 px-4 rounded-2xl border border-slate-200 bg-white text-sm font-bold text-slate-700"
               >
                 View All
@@ -389,9 +409,9 @@ export default function HomeScreen({ setScreen, onLogout }) {
 
                   <span
                     className={`rounded-full px-3 py-1 text-[11px] font-black ${
-                      flow.status === "Published"
-                        ? "bg-emerald-50 text-emerald-700"
-                        : "bg-amber-50 text-amber-700"
+                      flow.status === 'Published'
+                        ? 'bg-emerald-50 text-emerald-700'
+                        : 'bg-amber-50 text-amber-700'
                     }`}
                   >
                     {flow.status}
@@ -420,12 +440,12 @@ export default function HomeScreen({ setScreen, onLogout }) {
                 Documents Indexed
               </p>
               <p className="mt-2 text-3xl font-black text-slate-950">
-                {loading ? "..." : stats.documentsIndexed}
+                {loading ? '...' : stats.documentsIndexed}
               </p>
             </div>
 
             <button
-              onClick={() => setScreen("ai-settings")}
+              onClick={() => setScreen('ai-settings')}
               className="mt-5 h-11 w-full rounded-2xl bg-blue-600 text-white text-sm font-black"
             >
               Open AI Settings
