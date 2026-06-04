@@ -1,6 +1,6 @@
 import ChatbotSubnav from "../components/layout/ChatbotSubnav";
 import { useRef, useState } from "react";
-import { BookOpen, BrainCircuit, Plus } from "../lib/icons";
+import { BookOpen, BrainCircuit, Plus, Bot, Pencil, MessageCircle } from "../lib/icons";
 import useAiSettingsData from "../hooks/useAiSettingsData";
 
 const DEFAULT_ARTICLE_FORM = {
@@ -40,6 +40,27 @@ const isComingSoonDocument = (document) => {
   return extension && extension !== "txt";
 };
 
+const ToggleSwitch = ({ checked, onChange, label }) => {
+  return (
+    <button
+      type="button"
+      onClick={() => onChange(!checked)}
+      className="flex items-center justify-between w-full rounded-2xl border border-slate-200 bg-slate-50 p-4 hover:bg-white transition duration-200 cursor-pointer"
+    >
+      <span className="text-sm font-bold text-slate-700">{label}</span>
+      <div
+        className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${checked ? "bg-blue-600" : "bg-slate-200"
+          }`}
+      >
+        <span
+          className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-md ring-0 transition duration-200 ease-in-out ${checked ? "translate-x-5" : "translate-x-0"
+            }`}
+        />
+      </div>
+    </button>
+  );
+};
+
 export default function AiSettingsScreen({ setScreen }) {
   const {
     loading,
@@ -68,6 +89,7 @@ export default function AiSettingsScreen({ setScreen }) {
 
   const fileInputRef = useRef(null);
 
+  const [activeTab, setActiveTab] = useState("identify");
   const [uploading, setUploading] = useState(false);
   const [indexingDocumentId, setIndexingDocumentId] = useState(null);
   const [saveStatus, setSaveStatus] = useState("");
@@ -302,6 +324,33 @@ export default function AiSettingsScreen({ setScreen }) {
           </div>
         </div>
 
+        <div className="sticky top-16 z-20 border-b border-slate-200 bg-white/85 backdrop-blur-xl px-8 flex gap-6">
+          {[
+            { id: "identify", label: "AI Identify", icon: Bot },
+            { id: "behavior", label: "Behavior", icon: BrainCircuit },
+            { id: "instructions", label: "Instructions", icon: Pencil },
+            { id: "response_handoff", label: "Response & Handoff", icon: MessageCircle },
+            { id: "knowledge", label: "Knowledge", icon: BookOpen },
+          ].map((tab) => {
+            const Icon = tab.icon;
+            const isActive = activeTab === tab.id;
+            return (
+              <button
+                key={tab.id}
+                type="button"
+                onClick={() => setActiveTab(tab.id)}
+                className={`flex items-center gap-2 px-1 py-4 text-sm font-bold border-b-2 transition duration-200 -mb-px relative cursor-pointer ${isActive
+                  ? "border-blue-600 text-blue-600"
+                  : "border-transparent text-slate-500 hover:text-slate-800 hover:border-slate-300"
+                  }`}
+              >
+                <Icon size={16} />
+                {tab.label}
+              </button>
+            );
+          })}
+        </div>
+
         <div className="px-8 py-7 space-y-6">
           {error && (
             <div className="rounded-2xl border border-red-200 bg-red-50 px-5 py-4 text-sm font-semibold text-red-700">
@@ -309,87 +358,42 @@ export default function AiSettingsScreen({ setScreen }) {
             </div>
           )}
 
-          <section className="grid xl:grid-cols-[1fr_360px] gap-5">
-            <div className="relative overflow-hidden rounded-[2rem] bg-slate-950 p-8 shadow-xl">
-              <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(124,58,237,0.45),transparent_36%),radial-gradient(circle_at_bottom_left,rgba(37,99,235,0.35),transparent_32%)]" />
+          {activeTab === "identify" && (
+            <div className="space-y-6 animate-fadeIn">
+              <section className="grid xl:grid-cols-[1fr_360px] gap-5 items-stretch">
+                <div className="relative overflow-hidden rounded-[2rem] bg-slate-950 p-8 shadow-xl">
+                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(124,58,237,0.45),transparent_36%),radial-gradient(circle_at_bottom_left,rgba(37,99,235,0.35),transparent_32%)]" />
 
-              <div className="relative max-w-3xl">
-                <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-4 py-2 text-sm text-blue-50 mb-5">
-                  <BrainCircuit size={16} />
-                  Bot: {activeBot?.name || "Loading..."}
+                  <div className="relative max-w-3xl">
+                    <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-4 py-2 text-sm text-blue-50 mb-5">
+                      <BrainCircuit size={16} />
+                      Bot: {activeBot?.name || "Loading..."}
+                    </div>
+
+                    <h2 className="text-4xl font-black tracking-tight text-white">
+                      Behavioral AI control center.
+                    </h2>
+
+                    <p className="mt-3 text-blue-100 leading-7">
+                      Manage structured AI identity, behavior configuration,
+                      knowledge policy, custom instructions, guardrails, handoff
+                      rules, and knowledge sources.
+                    </p>
+                  </div>
                 </div>
 
-                <h2 className="text-4xl font-black tracking-tight text-white">
-                  Behavioral AI control center.
-                </h2>
-
-                <p className="mt-3 text-blue-100 leading-7">
-                  Manage structured AI identity, behavior configuration,
-                  knowledge policy, custom instructions, guardrails, handoff
-                  rules, and knowledge sources.
-                </p>
-              </div>
-            </div>
-
-            <div className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm">
-              <p className="font-black text-slate-950">Training Status</p>
-
-              <div className="mt-5 rounded-3xl bg-blue-50 border border-blue-100 p-5">
-                <p className="text-xs font-black text-blue-700 uppercase tracking-wide">
-                  Knowledge Health
-                </p>
-
-                <p className="mt-2 text-4xl font-black text-slate-950">
-                  {loading ? "..." : `${stats.knowledgeHealth}%`}
-                </p>
-
-                <p className="mt-2 text-sm text-slate-600">
-                  {getHealthDescription()}
-                </p>
-              </div>
-
-              <div className="mt-5 grid grid-cols-2 gap-3">
-                <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-                  <p className="text-xs font-black text-slate-400 uppercase">
-                    Documents
+                <div className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm flex flex-col justify-center">
+                  <p className="font-black text-slate-950">AI Identity Setup</p>
+                  <p className="mt-2 text-sm text-slate-600">
+                    Define who your AI agent is, what company it represents, and its basic traits or tone.
                   </p>
-                  <p className="mt-2 text-2xl font-black text-slate-950">
-                    {loading ? "..." : stats.totalDocuments}
-                  </p>
+                  <div className="mt-4 flex items-center gap-2 text-xs font-bold text-blue-600">
+                    <Bot size={14} />
+                    Configuring {activeBot?.name || "AI Agent"}
+                  </div>
                 </div>
+              </section>
 
-                <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-                  <p className="text-xs font-black text-slate-400 uppercase">
-                    Articles
-                  </p>
-                  <p className="mt-2 text-2xl font-black text-slate-950">
-                    {loading ? "..." : stats.totalArticles}
-                  </p>
-                </div>
-
-                <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-                  <p className="text-xs font-black text-slate-400 uppercase">
-                    Indexed
-                  </p>
-                  <p className="mt-2 text-2xl font-black text-slate-950">
-                    {loading ? "..." : stats.indexedDocuments}
-                  </p>
-                </div>
-
-                <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-                  <p className="text-xs font-black text-slate-400 uppercase">
-                    Published
-                  </p>
-                  <p className="mt-2 text-2xl font-black text-slate-950">
-                    {loading ? "..." : stats.publishedArticles}
-                  </p>
-                </div>
-              </div>
-            </div>
-          </section>
-
-          <section className="grid xl:grid-cols-[1fr_420px] gap-5">
-            <div className="space-y-5">
               <div className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm">
                 <div className="flex items-start justify-between gap-5">
                   <div>
@@ -476,7 +480,7 @@ export default function AiSettingsScreen({ setScreen }) {
                       updateSettingField("role_description", event.target.value)
                     }
                     className={`${settingTextareaClass} h-24`}
-                    placeholder="Customer support assistant..."
+                    placeholder="Example: You are a Customer Support Specialist for a SaaS company. Your role is to assist customers with product-related questions, troubleshoot common issues, provide accurate information based on company knowledge, and escalate complex cases to human agents when necessary."
                   />
                 </label>
               </div>
@@ -501,31 +505,70 @@ export default function AiSettingsScreen({ setScreen }) {
                 <div className="mt-6 grid md:grid-cols-3 gap-5">
                   <label className="block">
                     <span className={settingLabelClass}>Agent Role</span>
-                    <input
+                    <select
+                      value={settings.agent_role || ""}
+                      onChange={(event) =>
+                        updateSettingField("agent_role", event.target.value)
+                      }
+                      className={settingInputClass}
+                    >
+                      <option value="hr specialist">HR Specialist</option>
+                      <option value="recruiter">Recruiter</option>
+                      <option value="payroll officer">Payroll Officer</option>
+                      <option value="general hr">General HR</option>
+                      <option value="hrbp">HRBP</option>
+                    </select>
+                    {/* <input
                       value={settings.agent_role || ""}
                       onChange={(event) =>
                         updateSettingField("agent_role", event.target.value)
                       }
                       className={settingInputClass}
                       placeholder="HR Specialist"
-                    />
+                    /> */}
                   </label>
 
                   <label className="block">
                     <span className={settingLabelClass}>Department</span>
-                    <input
+                    <select
+                      value={settings.department || ""}
+                      onChange={(event) =>
+                        updateSettingField("department", event.target.value)
+                      }
+                      className={settingInputClass}
+                    >
+                      <option value="human resource">Human Resource</option>
+                      <option value="finance">Finance</option>
+                      <option value="legal">Legal</option>
+                      <option value="it">IT</option>
+                      <option value="operations">operations</option>
+                    </select>
+                    {/* <input
                       value={settings.department || ""}
                       onChange={(event) =>
                         updateSettingField("department", event.target.value)
                       }
                       className={settingInputClass}
                       placeholder="Human Resource"
-                    />
+                    /> */}
                   </label>
 
                   <label className="block">
                     <span className={settingLabelClass}>Primary Audience</span>
-                    <input
+                    <select
+                      value={settings.primary_audience || ""}
+                      onChange={(event) =>
+                        updateSettingField("primary_audience", event.target.value)
+                      }
+                      className={settingInputClass}
+                    >
+                      <option value="employee">Employee</option>
+                      <option value="manager">Manager</option>
+                      <option value="executive">Executive</option>
+                      <option value="public">Public</option>
+                      <option value="all staff">All Staff</option>
+                    </select>
+                    {/* <input
                       value={settings.primary_audience || ""}
                       onChange={(event) =>
                         updateSettingField(
@@ -535,11 +578,15 @@ export default function AiSettingsScreen({ setScreen }) {
                       }
                       className={settingInputClass}
                       placeholder="Employee"
-                    />
+                    /> */}
                   </label>
                 </div>
               </div>
+            </div>
+          )}
 
+          {activeTab === "behavior" && (
+            <div className="space-y-6 animate-fadeIn">
               <div className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm">
                 <div className="flex items-start justify-between gap-5">
                   <div>
@@ -700,7 +747,11 @@ export default function AiSettingsScreen({ setScreen }) {
                   </div>
                 </div>
               </div>
+            </div>
+          )}
 
+          {activeTab === "instructions" && (
+            <div className="space-y-6 animate-fadeIn">
               <div className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm">
                 <h2 className="text-xl font-black text-slate-950">
                   Instructions & Guardrails
@@ -872,498 +923,602 @@ export default function AiSettingsScreen({ setScreen }) {
                   />
                 </label>
               </div>
+            </div>
+          )}
 
-              <div className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm">
-                <h2 className="text-xl font-black text-slate-950">
-                  Response Behavior & Handoff Rules
-                </h2>
+          {activeTab === "response_handoff" && (
+            <div className="grid xl:grid-cols-[1fr_420px] gap-5 animate-fadeIn">
+              <div className="space-y-5">
+                <div className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm">
+                  <div className="flex items-start justify-between gap-5">
+                    <div>
+                      <h2 className="text-xl font-black text-slate-950">
+                        Response Behavior
+                      </h2>
+                      <p className="mt-1 text-sm text-slate-500">
+                        Configure answer properties and basic style settings for LLM generation.
+                      </p>
+                    </div>
 
-                <div className="mt-6 grid md:grid-cols-2 gap-5">
-                  <label className="block">
-                    <span className={settingLabelClass}>Answer Length</span>
-                    <select
-                      value={settings.answer_length || "medium"}
-                      onChange={(event) =>
-                        updateSettingField("answer_length", event.target.value)
-                      }
-                      className={settingInputClass}
-                    >
-                      <option value="short">Short</option>
-                      <option value="medium">Medium</option>
-                      <option value="detailed">Detailed</option>
-                      <option value="long">Long</option>
-                    </select>
-                  </label>
-
-                  <label className="block">
-                    <span className={settingLabelClass}>Handoff Target</span>
-                    <input
-                      value={settings.handoff_target || ""}
-                      onChange={(event) =>
-                        updateSettingField("handoff_target", event.target.value)
-                      }
-                      className={settingInputClass}
-                      placeholder="Support Agent, HR Team, Sales Team, Finance Team"
-                    />
-                  </label>
-
-                  <label className="block">
-                    <span className={settingLabelClass}>
-                      Confidence Threshold
+                    <span className="rounded-full bg-blue-50 px-3 py-1 text-xs font-black text-blue-700">
+                      Generation
                     </span>
-                    <input
-                      type="number"
-                      min="0"
-                      max="1"
-                      step="0.05"
-                      value={settings.confidence_threshold ?? 0.7}
-                      onChange={(event) =>
-                        updateSettingField(
-                          "confidence_threshold",
-                          Number(event.target.value)
-                        )
-                      }
-                      className={settingInputClass}
-                    />
-                  </label>
+                  </div>
+
+                  <div className="mt-6 grid md:grid-cols-2 gap-5">
+                    <label className="block">
+                      <span className={settingLabelClass}>Answer Length</span>
+                      <select
+                        value={settings.answer_length || "medium"}
+                        onChange={(event) =>
+                          updateSettingField("answer_length", event.target.value)
+                        }
+                        className={settingInputClass}
+                      >
+                        <option value="short">Short</option>
+                        <option value="medium">Medium</option>
+                        <option value="detailed">Detailed</option>
+                        <option value="long">Long</option>
+                      </select>
+                    </label>
+
+                    <label className="block">
+                      <span className={settingLabelClass}>
+                        Confidence Threshold
+                      </span>
+                      <input
+                        type="number"
+                        min="0"
+                        max="1"
+                        step="0.05"
+                        value={settings.confidence_threshold ?? 0.7}
+                        onChange={(event) =>
+                          updateSettingField(
+                            "confidence_threshold",
+                            Number(event.target.value)
+                          )
+                        }
+                        className={settingInputClass}
+                      />
+                    </label>
+                  </div>
+
+                  <div className="mt-6 grid md:grid-cols-2 gap-3">
+                    {[
+                      ["use_bullets", "Use bullet points"],
+                      ["ask_follow_up", "Ask follow-up question"],
+                      ["show_sources", "Show knowledge sources"],
+                    ].map(([field, label]) => (
+                      <ToggleSwitch
+                        key={field}
+                        checked={Boolean(settings[field])}
+                        onChange={(val) => updateSettingField(field, val)}
+                        label={label}
+                      />
+                    ))}
+                  </div>
                 </div>
 
-                <div className="mt-6 grid md:grid-cols-2 gap-3">
-                  {[
-                    ["use_bullets", "Use bullet points"],
-                    ["ask_follow_up", "Ask follow-up question"],
-                    ["show_sources", "Show knowledge sources"],
-                    ["handoff_when_no_answer", "Handoff when no answer"],
-                    [
-                      "handoff_when_customer_requests_agent",
-                      "Handoff when customer asks human",
-                    ],
-                    [
-                      "handoff_when_pricing_request",
-                      "Handoff for pricing/proposal request",
-                    ],
-                  ].map(([field, label]) => (
-                    <label
-                      key={field}
-                      className="flex items-start gap-3 rounded-2xl border border-slate-200 bg-slate-50 p-4 cursor-pointer hover:bg-white transition"
-                    >
+                <div className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm">
+                  <div className="flex items-start justify-between gap-5">
+                    <div>
+                      <h2 className="text-xl font-black text-slate-950">
+                        Handoff Rules
+                      </h2>
+                      <p className="mt-1 text-sm text-slate-500">
+                        Define conditions under which the conversation should be handed off to a human agent.
+                      </p>
+                    </div>
+
+                    <span className="rounded-full bg-violet-50 px-3 py-1 text-xs font-black text-violet-700">
+                      Escalation
+                    </span>
+                  </div>
+
+                  <div className="mt-6">
+                    <label className="block">
+                      <span className={settingLabelClass}>Handoff Target</span>
                       <input
-                        type="checkbox"
-                        checked={Boolean(settings[field])}
+                        value={settings.handoff_target || ""}
                         onChange={(event) =>
-                          updateSettingField(field, event.target.checked)
+                          updateSettingField("handoff_target", event.target.value)
                         }
-                        className="mt-1 h-4 w-4"
+                        className={settingInputClass}
+                        placeholder="Support Agent, HR Team, Sales Team, Finance Team"
                       />
-                      <span className="text-sm font-bold text-slate-700">
-                        {label}
-                      </span>
                     </label>
-                  ))}
+                  </div>
+
+                  <div className="mt-6 grid md:grid-cols-2 gap-3">
+                    {[
+                      ["handoff_when_no_answer", "Handoff when no answer"],
+                      [
+                        "handoff_when_customer_requests_agent",
+                        "Handoff when customer asks human",
+                      ],
+                      [
+                        "handoff_when_pricing_request",
+                        "Handoff for pricing/proposal request",
+                      ],
+                    ].map(([field, label]) => (
+                      <ToggleSwitch
+                        key={field}
+                        checked={Boolean(settings[field])}
+                        onChange={(val) => updateSettingField(field, val)}
+                        label={label}
+                      />
+                    ))}
+                  </div>
                 </div>
               </div>
 
-              <div className="rounded-[2rem] border border-slate-200 bg-white shadow-sm overflow-hidden">
-                <div className="p-6 border-b border-slate-200 flex items-center justify-between">
-                  <div>
-                    <h2 className="text-xl font-black text-slate-950">
-                      Knowledge Documents
-                    </h2>
-                    <p className="mt-1 text-sm text-slate-500">
-                      Upload knowledge documents used by AI Agent. TXT indexing
-                      is available now. PDF, DOCX, CSV, and XLSX indexing are
-                      coming soon.
-                    </p>
+              <aside className="space-y-5">
+                <div className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm">
+                  <h2 className="text-xl font-black text-slate-950">
+                    Active Configuration Summary
+                  </h2>
+
+                  <p className="mt-1 text-sm text-slate-500">
+                    Quick view of the active behavior configuration.
+                  </p>
+
+                  <div className="mt-5 space-y-3 text-sm">
+                    {[
+                      ["Agent Role", settings.agent_role || "-"],
+                      ["Department", settings.department || "-"],
+                      ["Audience", settings.primary_audience || "-"],
+                      ["Knowledge Mode", settings.knowledge_mode || "-"],
+                      ["Handoff Target", settings.handoff_target || "-"],
+                    ].map(([label, value]) => (
+                      <div
+                        key={label}
+                        className="flex justify-between gap-4 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3"
+                      >
+                        <span className="text-slate-500">{label}</span>
+                        <span className="font-black text-slate-900 text-right">
+                          {value}
+                        </span>
+                      </div>
+                    ))}
                   </div>
+                </div>
+              </aside>
+            </div>
+          )}
 
-                  <div>
-                    <input
-                      ref={fileInputRef}
-                      type="file"
-                      accept=".txt"
-                      className="hidden"
-                      onChange={handleUploadFile}
-                    />
+          {activeTab === "knowledge" && (
+            <div className="grid xl:grid-cols-[1fr_420px] gap-5 animate-fadeIn">
+              <div className="space-y-5">
+                <div className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm">
+                  <p className="font-black text-slate-950">Training Status</p>
 
-                    <button
-                      type="button"
-                      onClick={handleOpenFilePicker}
-                      disabled={uploading}
-                      className="h-10 px-4 rounded-2xl bg-blue-600 text-white text-sm font-bold flex items-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed hover:bg-blue-700 transition"
-                    >
-                      <Plus size={16} />
-                      {uploading ? "Uploading..." : "Upload TXT"}
-                    </button>
+                  <div className="mt-5 grid md:grid-cols-2 gap-5 items-center">
+                    <div className="rounded-3xl bg-blue-50 border border-blue-100 p-5">
+                      <p className="text-xs font-black text-blue-700 uppercase tracking-wide">
+                        Knowledge Health
+                      </p>
+
+                      <p className="mt-2 text-4xl font-black text-slate-950">
+                        {loading ? "..." : `${stats.knowledgeHealth}%`}
+                      </p>
+
+                      <p className="mt-2 text-sm text-slate-600">
+                        {getHealthDescription()}
+                      </p>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                        <p className="text-xs font-black text-slate-400 uppercase">
+                          Documents
+                        </p>
+                        <p className="mt-2 text-2xl font-black text-slate-950">
+                          {loading ? "..." : stats.totalDocuments}
+                        </p>
+                      </div>
+
+                      <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                        <p className="text-xs font-black text-slate-400 uppercase">
+                          Articles
+                        </p>
+                        <p className="mt-2 text-2xl font-black text-slate-950">
+                          {loading ? "..." : stats.totalArticles}
+                        </p>
+                      </div>
+
+                      <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                        <p className="text-xs font-black text-slate-400 uppercase">
+                          Indexed
+                        </p>
+                        <p className="mt-2 text-2xl font-black text-slate-950">
+                          {loading ? "..." : stats.indexedDocuments}
+                        </p>
+                      </div>
+
+                      <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                        <p className="text-xs font-black text-slate-400 uppercase">
+                          Published
+                        </p>
+                        <p className="mt-2 text-2xl font-black text-slate-950">
+                          {loading ? "..." : stats.publishedArticles}
+                        </p>
+                      </div>
+                    </div>
                   </div>
                 </div>
 
-                <div className="p-6">
-                  <div className="rounded-3xl border-2 border-dashed border-slate-200 bg-slate-50 p-8 text-center">
-                    <div className="mx-auto h-14 w-14 rounded-2xl bg-white text-blue-700 grid place-items-center shadow-sm">
-                      <BookOpen size={24} />
+                <div className="rounded-[2rem] border border-slate-200 bg-white shadow-sm overflow-hidden">
+                  <div className="p-6 border-b border-slate-200 flex items-center justify-between">
+                    <div>
+                      <h2 className="text-xl font-black text-slate-950">
+                        Knowledge Documents
+                      </h2>
+                      <p className="mt-1 text-sm text-slate-500">
+                        Upload knowledge documents used by AI Agent. TXT indexing
+                        is available now. PDF, DOCX, CSV, and XLSX indexing are
+                        coming soon.
+                      </p>
                     </div>
 
-                    <h3 className="mt-4 font-black text-slate-950">
-                      Drop TXT file here or browse
-                    </h3>
+                    <div>
+                      <input
+                        ref={fileInputRef}
+                        type="file"
+                        accept=".txt"
+                        className="hidden"
+                        onChange={handleUploadFile}
+                      />
 
-                    <p className="mt-2 text-sm text-slate-500">
-                      AI indexing currently supports TXT files. PDF, DOCX, CSV,
-                      and XLSX support is coming soon.
-                    </p>
+                      <button
+                        type="button"
+                        onClick={handleOpenFilePicker}
+                        disabled={uploading}
+                        className="h-10 px-4 rounded-2xl bg-blue-600 text-white text-sm font-bold flex items-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed hover:bg-blue-700 transition"
+                      >
+                        <Plus size={16} />
+                        {uploading ? "Uploading..." : "Upload TXT"}
+                      </button>
+                    </div>
                   </div>
 
-                  <div className="mt-6 divide-y divide-slate-100 rounded-3xl border border-slate-200 overflow-hidden">
+                  <div className="p-6">
+                    <div className="rounded-3xl border-2 border-dashed border-slate-200 bg-slate-50 p-8 text-center">
+                      <div className="mx-auto h-14 w-14 rounded-2xl bg-white text-blue-700 grid place-items-center shadow-sm">
+                        <BookOpen size={24} />
+                      </div>
+
+                      <h3 className="mt-4 font-black text-slate-950">
+                        Drop TXT file here or browse
+                      </h3>
+
+                      <p className="mt-2 text-sm text-slate-500">
+                        AI indexing currently supports TXT files. PDF, DOCX, CSV,
+                        and XLSX support is coming soon.
+                      </p>
+                    </div>
+
+                    <div className="mt-6 divide-y divide-slate-100 rounded-3xl border border-slate-200 overflow-hidden">
+                      {loading && (
+                        <div className="p-5 text-sm font-semibold text-slate-500">
+                          Loading knowledge documents...
+                        </div>
+                      )}
+
+                      {!loading && documents.length === 0 && (
+                        <div className="p-5 text-sm font-semibold text-slate-500">
+                          No knowledge documents found.
+                        </div>
+                      )}
+
+                      {!loading &&
+                        documents.map((doc) => (
+                          <div
+                            key={doc.id}
+                            className="p-5 flex items-center justify-between gap-5 hover:bg-slate-50 transition"
+                          >
+                            <div className="flex items-center gap-4 min-w-0">
+                              <div className="h-11 w-11 rounded-2xl bg-blue-50 text-blue-700 grid place-items-center shrink-0">
+                                <BookOpen size={19} />
+                              </div>
+
+                              <div className="min-w-0">
+                                <p className="font-black text-slate-950 truncate">
+                                  {doc.file_name}
+                                </p>
+
+                                <p className="mt-1 text-xs text-slate-500">
+                                  {formatSourceType(doc.source_type)} ·{" "}
+                                  {doc.total_chunks || 0} chunks ·{" "}
+                                  {doc.indexed_chunks || 0} indexed · Updated{" "}
+                                  {formatUpdatedAt(doc.updated_at)}
+                                </p>
+
+                                {doc.description && (
+                                  <p className="mt-2 max-w-2xl text-xs leading-5 text-slate-500">
+                                    {doc.description}
+                                  </p>
+                                )}
+
+                                {doc.error_message && (
+                                  <p className="mt-2 max-w-2xl text-xs leading-5 text-red-600">
+                                    {doc.error_message}
+                                  </p>
+                                )}
+                              </div>
+                            </div>
+
+                            <div className="flex flex-col items-end gap-2 shrink-0">
+                              <div className="flex items-center gap-2">
+                                {canIndexDocument(doc) && (
+                                  <button
+                                    type="button"
+                                    onClick={() => handleIndexDocument(doc)}
+                                    disabled={indexingDocumentId === doc.id}
+                                    className="h-8 px-3 rounded-xl bg-slate-950 text-white text-[11px] font-black disabled:opacity-60"
+                                  >
+                                    {indexingDocumentId === doc.id
+                                      ? "Indexing..."
+                                      : doc.status === "indexed"
+                                        ? "Re-index"
+                                        : "Index"}
+                                  </button>
+                                )}
+
+                                {isComingSoonDocument(doc) && (
+                                  <span className="rounded-full bg-amber-50 px-3 py-1 text-[11px] font-black text-amber-700">
+                                    Indexing Soon
+                                  </span>
+                                )}
+
+                                <button
+                                  type="button"
+                                  onClick={() => handleDeleteDocument(doc)}
+                                  className="h-8 px-3 rounded-xl border border-red-100 bg-red-50 text-red-600 text-[11px] font-black hover:bg-red-100 transition"
+                                >
+                                  Delete
+                                </button>
+
+                                <span
+                                  className={`rounded-full px-3 py-1 text-[11px] font-black ${getStatusClass(
+                                    doc.status
+                                  )}`}
+                                >
+                                  {formatStatus(doc.status)}
+                                </span>
+                              </div>
+
+                              <p className="text-[11px] text-slate-400">
+                                {getDocumentExtension(doc)?.toUpperCase() ||
+                                  "UNKNOWN"}{" "}
+                                ·{" "}
+                                {doc.status === "indexed"
+                                  ? "Ready for AI"
+                                  : doc.status === "processing"
+                                    ? "Processing"
+                                    : doc.status === "failed"
+                                      ? "Needs attention"
+                                      : "Awaiting indexing"}
+                              </p>
+                            </div>
+                          </div>
+                        ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <aside className="space-y-5">
+                <form
+                  onSubmit={handleCreateArticle}
+                  className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm"
+                >
+                  <h2 className="text-xl font-black text-slate-950">
+                    Add Knowledge Article
+                  </h2>
+                  <p className="mt-1 text-sm text-slate-500">
+                    Add manual article like FAQ, policy, product info, or support
+                    guidance.
+                  </p>
+
+                  {articleError && (
+                    <div className="mt-5 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-700">
+                      {articleError}
+                    </div>
+                  )}
+
+                  <div className="mt-5 space-y-4">
+                    <input
+                      value={articleForm.title}
+                      onChange={(event) =>
+                        updateArticleForm("title", event.target.value)
+                      }
+                      className="h-12 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 text-sm font-semibold outline-none"
+                      placeholder="Article title"
+                    />
+
+                    <div className="grid grid-cols-2 gap-3">
+                      <input
+                        value={articleForm.category}
+                        onChange={(event) =>
+                          updateArticleForm("category", event.target.value)
+                        }
+                        className="h-12 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 text-sm font-semibold outline-none"
+                        placeholder="Category"
+                      />
+
+                      <select
+                        value={articleForm.status}
+                        onChange={(event) =>
+                          updateArticleForm("status", event.target.value)
+                        }
+                        className="h-12 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 text-sm font-semibold outline-none"
+                      >
+                        <option value="draft">Draft</option>
+                        <option value="published">Published</option>
+                      </select>
+                    </div>
+
+                    <input
+                      value={articleForm.tags}
+                      onChange={(event) =>
+                        updateArticleForm("tags", event.target.value)
+                      }
+                      className="h-12 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 text-sm font-semibold outline-none"
+                      placeholder="Tags: salesforce, crm, pricing"
+                    />
+
+                    <textarea
+                      value={articleForm.content}
+                      onChange={(event) =>
+                        updateArticleForm("content", event.target.value)
+                      }
+                      className="h-40 w-full rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm outline-none resize-none"
+                      placeholder="Write knowledge content here..."
+                    />
+
+                    <button
+                      type="submit"
+                      disabled={savingArticle}
+                      className="h-11 w-full rounded-2xl bg-emerald-600 text-white text-sm font-black disabled:opacity-60 hover:bg-emerald-700 transition"
+                    >
+                      {savingArticle ? "Adding..." : "Add Article"}
+                    </button>
+                  </div>
+                </form>
+
+                <div className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm">
+                  <h2 className="text-xl font-black text-slate-950">
+                    Knowledge Articles
+                  </h2>
+                  <p className="mt-1 text-sm text-slate-500">
+                    {loading ? "Loading..." : `${articles.length} articles`}
+                  </p>
+
+                  <div className="mt-5 space-y-3">
                     {loading && (
-                      <div className="p-5 text-sm font-semibold text-slate-500">
-                        Loading knowledge documents...
+                      <div className="rounded-2xl bg-slate-50 p-4 text-sm font-semibold text-slate-500">
+                        Loading articles...
                       </div>
                     )}
 
-                    {!loading && documents.length === 0 && (
-                      <div className="p-5 text-sm font-semibold text-slate-500">
-                        No knowledge documents found.
+                    {!loading && articles.length === 0 && (
+                      <div className="rounded-2xl bg-slate-50 p-4 text-sm font-semibold text-slate-500">
+                        No article yet.
                       </div>
                     )}
 
                     {!loading &&
-                      documents.map((doc) => (
+                      articles.map((article) => (
                         <div
-                          key={doc.id}
-                          className="p-5 flex items-center justify-between gap-5 hover:bg-slate-50 transition"
+                          key={article.id}
+                          className="rounded-2xl border border-slate-200 bg-slate-50 p-4"
                         >
-                          <div className="flex items-center gap-4 min-w-0">
-                            <div className="h-11 w-11 rounded-2xl bg-blue-50 text-blue-700 grid place-items-center shrink-0">
-                              <BookOpen size={19} />
-                            </div>
-
-                            <div className="min-w-0">
-                              <p className="font-black text-slate-950 truncate">
-                                {doc.file_name}
+                          <div className="flex items-start justify-between gap-3">
+                            <div>
+                              <p className="font-black text-slate-950">
+                                {article.title}
                               </p>
-
                               <p className="mt-1 text-xs text-slate-500">
-                                {formatSourceType(doc.source_type)} ·{" "}
-                                {doc.total_chunks || 0} chunks ·{" "}
-                                {doc.indexed_chunks || 0} indexed · Updated{" "}
-                                {formatUpdatedAt(doc.updated_at)}
+                                {article.category || "Uncategorized"} ·{" "}
+                                {article.status}
                               </p>
-
-                              {doc.description && (
-                                <p className="mt-2 max-w-2xl text-xs leading-5 text-slate-500">
-                                  {doc.description}
-                                </p>
-                              )}
-
-                              {doc.error_message && (
-                                <p className="mt-2 max-w-2xl text-xs leading-5 text-red-600">
-                                  {doc.error_message}
-                                </p>
-                              )}
                             </div>
+
+                            <button
+                              type="button"
+                              onClick={() => handleDeleteArticle(article)}
+                              className="h-9 px-3 rounded-xl border border-red-100 bg-red-50 text-red-600 text-xs font-black"
+                            >
+                              Delete
+                            </button>
                           </div>
 
-                          <div className="flex flex-col items-end gap-2 shrink-0">
-                            <div className="flex items-center gap-2">
-                              {canIndexDocument(doc) && (
-                                <button
-                                  type="button"
-                                  onClick={() => handleIndexDocument(doc)}
-                                  disabled={indexingDocumentId === doc.id}
-                                  className="h-8 px-3 rounded-xl bg-slate-950 text-white text-[11px] font-black disabled:opacity-60"
+                          <p className="mt-3 text-sm leading-6 text-slate-600 max-h-24 overflow-hidden">
+                            {article.content}
+                          </p>
+
+                          {article.tags?.length > 0 && (
+                            <div className="mt-3 flex flex-wrap gap-2">
+                              {article.tags.map((tag) => (
+                                <span
+                                  key={tag}
+                                  className="rounded-full bg-white border border-slate-200 px-3 py-1 text-[11px] font-bold text-slate-500"
                                 >
-                                  {indexingDocumentId === doc.id
-                                    ? "Indexing..."
-                                    : doc.status === "indexed"
-                                    ? "Re-index"
-                                    : "Index"}
-                                </button>
-                              )}
-
-                              {isComingSoonDocument(doc) && (
-                                <span className="rounded-full bg-amber-50 px-3 py-1 text-[11px] font-black text-amber-700">
-                                  Indexing Soon
+                                  {tag}
                                 </span>
-                              )}
-
-                              <button
-                                type="button"
-                                onClick={() => handleDeleteDocument(doc)}
-                                className="h-8 px-3 rounded-xl border border-red-100 bg-red-50 text-red-600 text-[11px] font-black hover:bg-red-100 transition"
-                              >
-                                Delete
-                              </button>
-
-                              <span
-                                className={`rounded-full px-3 py-1 text-[11px] font-black ${getStatusClass(
-                                  doc.status
-                                )}`}
-                              >
-                                {formatStatus(doc.status)}
-                              </span>
+                              ))}
                             </div>
+                          )}
 
-                            <p className="text-[11px] text-slate-400">
-                              {getDocumentExtension(doc)?.toUpperCase() ||
-                                "UNKNOWN"}{" "}
-                              ·{" "}
-                              {doc.status === "indexed"
-                                ? "Ready for AI"
-                                : doc.status === "processing"
-                                ? "Processing"
-                                : doc.status === "failed"
-                                ? "Needs attention"
-                                : "Awaiting indexing"}
-                            </p>
+                          <div className="mt-4">
+                            <select
+                              value={article.status}
+                              onChange={(event) =>
+                                updateArticleStatus(article.id, event.target.value)
+                              }
+                              className="h-10 w-full rounded-2xl border border-slate-200 bg-white px-3 text-sm font-semibold outline-none"
+                            >
+                              <option value="draft">Draft</option>
+                              <option value="published">Published</option>
+                            </select>
                           </div>
                         </div>
                       ))}
                   </div>
                 </div>
-              </div>
-            </div>
 
-            <aside className="space-y-5">
-              <div className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm">
-                <h2 className="text-xl font-black text-slate-950">
-                  Runtime Summary
-                </h2>
+                <div className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm">
+                  <h2 className="text-xl font-black text-slate-950">
+                    Indexing Summary
+                  </h2>
 
-                <p className="mt-1 text-sm text-slate-500">
-                  Quick view of the active behavior configuration.
-                </p>
-
-                <div className="mt-5 space-y-3 text-sm">
-                  {[
-                    ["Agent Role", settings.agent_role || "-"],
-                    ["Department", settings.department || "-"],
-                    ["Audience", settings.primary_audience || "-"],
-                    ["Knowledge Mode", settings.knowledge_mode || "-"],
-                    ["Handoff Target", settings.handoff_target || "-"],
-                  ].map(([label, value]) => (
-                    <div
-                      key={label}
-                      className="flex justify-between gap-4 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3"
-                    >
-                      <span className="text-slate-500">{label}</span>
-                      <span className="font-black text-slate-900 text-right">
-                        {value}
+                  <div className="mt-5 space-y-3 text-sm">
+                    <div className="flex justify-between">
+                      <span className="text-slate-500">Uploaded</span>
+                      <span className="font-black text-blue-600">
+                        {loading ? "..." : stats.uploadedDocuments}
                       </span>
                     </div>
-                  ))}
-                </div>
-              </div>
 
-              <form
-                onSubmit={handleCreateArticle}
-                className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm"
-              >
-                <h2 className="text-xl font-black text-slate-950">
-                  Add Knowledge Article
-                </h2>
-                <p className="mt-1 text-sm text-slate-500">
-                  Add manual article like FAQ, policy, product info, or support
-                  guidance.
-                </p>
-
-                {articleError && (
-                  <div className="mt-5 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-700">
-                    {articleError}
-                  </div>
-                )}
-
-                <div className="mt-5 space-y-4">
-                  <input
-                    value={articleForm.title}
-                    onChange={(event) =>
-                      updateArticleForm("title", event.target.value)
-                    }
-                    className="h-12 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 text-sm font-semibold outline-none"
-                    placeholder="Article title"
-                  />
-
-                  <div className="grid grid-cols-2 gap-3">
-                    <input
-                      value={articleForm.category}
-                      onChange={(event) =>
-                        updateArticleForm("category", event.target.value)
-                      }
-                      className="h-12 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 text-sm font-semibold outline-none"
-                      placeholder="Category"
-                    />
-
-                    <select
-                      value={articleForm.status}
-                      onChange={(event) =>
-                        updateArticleForm("status", event.target.value)
-                      }
-                      className="h-12 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 text-sm font-semibold outline-none"
-                    >
-                      <option value="draft">Draft</option>
-                      <option value="published">Published</option>
-                    </select>
-                  </div>
-
-                  <input
-                    value={articleForm.tags}
-                    onChange={(event) =>
-                      updateArticleForm("tags", event.target.value)
-                    }
-                    className="h-12 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 text-sm font-semibold outline-none"
-                    placeholder="Tags: salesforce, crm, pricing"
-                  />
-
-                  <textarea
-                    value={articleForm.content}
-                    onChange={(event) =>
-                      updateArticleForm("content", event.target.value)
-                    }
-                    className="h-40 w-full rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm outline-none resize-none"
-                    placeholder="Write knowledge content here..."
-                  />
-
-                  <button
-                    type="submit"
-                    disabled={savingArticle}
-                    className="h-11 w-full rounded-2xl bg-emerald-600 text-white text-sm font-black disabled:opacity-60 hover:bg-emerald-700 transition"
-                  >
-                    {savingArticle ? "Adding..." : "Add Article"}
-                  </button>
-                </div>
-              </form>
-
-              <div className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm">
-                <h2 className="text-xl font-black text-slate-950">
-                  Knowledge Articles
-                </h2>
-                <p className="mt-1 text-sm text-slate-500">
-                  {loading ? "Loading..." : `${articles.length} articles`}
-                </p>
-
-                <div className="mt-5 space-y-3">
-                  {loading && (
-                    <div className="rounded-2xl bg-slate-50 p-4 text-sm font-semibold text-slate-500">
-                      Loading articles...
+                    <div className="flex justify-between">
+                      <span className="text-slate-500">Processing</span>
+                      <span className="font-black text-amber-600">
+                        {loading ? "..." : stats.processingDocuments}
+                      </span>
                     </div>
-                  )}
 
-                  {!loading && articles.length === 0 && (
-                    <div className="rounded-2xl bg-slate-50 p-4 text-sm font-semibold text-slate-500">
-                      No article yet.
+                    <div className="flex justify-between">
+                      <span className="text-slate-500">Failed</span>
+                      <span className="font-black text-red-600">
+                        {loading ? "..." : stats.failedDocuments}
+                      </span>
                     </div>
-                  )}
 
-                  {!loading &&
-                    articles.map((article) => (
-                      <div
-                        key={article.id}
-                        className="rounded-2xl border border-slate-200 bg-slate-50 p-4"
-                      >
-                        <div className="flex items-start justify-between gap-3">
-                          <div>
-                            <p className="font-black text-slate-950">
-                              {article.title}
-                            </p>
-                            <p className="mt-1 text-xs text-slate-500">
-                              {article.category || "Uncategorized"} ·{" "}
-                              {article.status}
-                            </p>
-                          </div>
+                    <div className="flex justify-between">
+                      <span className="text-slate-500">Indexed Chunks</span>
+                      <span className="font-black text-slate-950">
+                        {loading ? "..." : stats.indexedChunks}
+                      </span>
+                    </div>
 
-                          <button
-                            type="button"
-                            onClick={() => handleDeleteArticle(article)}
-                            className="h-9 px-3 rounded-xl border border-red-100 bg-red-50 text-red-600 text-xs font-black"
-                          >
-                            Delete
-                          </button>
-                        </div>
+                    <div className="flex justify-between">
+                      <span className="text-slate-500">Stored Chunks</span>
+                      <span className="font-black text-slate-950">
+                        {loading ? "..." : stats.storedChunks}
+                      </span>
+                    </div>
 
-                        <p className="mt-3 text-sm leading-6 text-slate-600 max-h-24 overflow-hidden">
-                          {article.content}
-                        </p>
-
-                        {article.tags?.length > 0 && (
-                          <div className="mt-3 flex flex-wrap gap-2">
-                            {article.tags.map((tag) => (
-                              <span
-                                key={tag}
-                                className="rounded-full bg-white border border-slate-200 px-3 py-1 text-[11px] font-bold text-slate-500"
-                              >
-                                {tag}
-                              </span>
-                            ))}
-                          </div>
-                        )}
-
-                        <div className="mt-4">
-                          <select
-                            value={article.status}
-                            onChange={(event) =>
-                              updateArticleStatus(article.id, event.target.value)
-                            }
-                            className="h-10 w-full rounded-2xl border border-slate-200 bg-white px-3 text-sm font-semibold outline-none"
-                          >
-                            <option value="draft">Draft</option>
-                            <option value="published">Published</option>
-                          </select>
-                        </div>
-                      </div>
-                    ))}
-                </div>
-              </div>
-
-              <div className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm">
-                <h2 className="text-xl font-black text-slate-950">
-                  Indexing Summary
-                </h2>
-
-                <div className="mt-5 space-y-3 text-sm">
-                  <div className="flex justify-between">
-                    <span className="text-slate-500">Uploaded</span>
-                    <span className="font-black text-blue-600">
-                      {loading ? "..." : stats.uploadedDocuments}
-                    </span>
-                  </div>
-
-                  <div className="flex justify-between">
-                    <span className="text-slate-500">Processing</span>
-                    <span className="font-black text-amber-600">
-                      {loading ? "..." : stats.processingDocuments}
-                    </span>
-                  </div>
-
-                  <div className="flex justify-between">
-                    <span className="text-slate-500">Failed</span>
-                    <span className="font-black text-red-600">
-                      {loading ? "..." : stats.failedDocuments}
-                    </span>
-                  </div>
-
-                  <div className="flex justify-between">
-                    <span className="text-slate-500">Indexed Chunks</span>
-                    <span className="font-black text-slate-950">
-                      {loading ? "..." : stats.indexedChunks}
-                    </span>
-                  </div>
-
-                  <div className="flex justify-between">
-                    <span className="text-slate-500">Stored Chunks</span>
-                    <span className="font-black text-slate-950">
-                      {loading ? "..." : stats.storedChunks}
-                    </span>
-                  </div>
-
-                  <div className="flex justify-between">
-                    <span className="text-slate-500">Draft Articles</span>
-                    <span className="font-black text-slate-950">
-                      {loading ? "..." : stats.draftArticles}
-                    </span>
+                    <div className="flex justify-between">
+                      <span className="text-slate-500">Draft Articles</span>
+                      <span className="font-black text-slate-950">
+                        {loading ? "..." : stats.draftArticles}
+                      </span>
+                    </div>
                   </div>
                 </div>
-              </div>
-            </aside>
-          </section>
+              </aside>
+            </div>
+          )}
         </div>
       </main>
     </div>
