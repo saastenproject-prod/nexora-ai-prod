@@ -36,15 +36,23 @@ const canIndexDocument = (document) => {
   const extension = getDocumentExtension(document);
 
   return (
-    extension === 'txt' &&
-    ['uploaded', 'indexed', 'failed'].includes(document.status)
+    extension === 'txt' ||
+    extension === 'pdf' ||
+    extension === 'docx' ||
+    (extension === 'csv' &&
+      ['uploaded', 'indexed', 'failed'].includes(document.status))
   );
 };
 
 const isComingSoonDocument = (document) => {
   const extension = getDocumentExtension(document);
 
-  return extension && extension !== 'txt';
+  return (
+    (extension && extension !== 'txt') ||
+    extension === 'pdf' ||
+    extension === 'docx' ||
+    extension === 'csv'
+  );
 };
 
 const ToggleSwitch = ({ checked, onChange, label }) => {
@@ -1186,9 +1194,8 @@ export default function AiSettingsScreen({ setScreen }) {
                         Knowledge Documents
                       </h2>
                       <p className="mt-1 text-sm text-slate-500">
-                        Upload knowledge documents used by AI Agent. TXT
-                        indexing is available now. PDF, DOCX, CSV, and XLSX
-                        indexing are coming soon.
+                        Upload knowledge documents used by AI Agent. TXT, PDF,
+                        DOCX, and CSV indexing is available now.
                       </p>
                     </div>
 
@@ -1196,7 +1203,7 @@ export default function AiSettingsScreen({ setScreen }) {
                       <input
                         ref={fileInputRef}
                         type="file"
-                        accept=".txt"
+                        accept=".txt,.pdf,.docx,.csv"
                         className="hidden"
                         onChange={handleUploadFile}
                       />
@@ -1205,10 +1212,10 @@ export default function AiSettingsScreen({ setScreen }) {
                         type="button"
                         onClick={handleOpenFilePicker}
                         disabled={uploading}
-                        className="h-10 px-4 rounded-2xl bg-blue-600 text-white text-sm font-bold flex items-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed hover:bg-blue-700 transition"
+                        className=" px-4 py-1 rounded-2xl bg-blue-600 text-white text-sm font-bold flex items-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed hover:bg-blue-700 transition"
                       >
                         <Plus size={16} />
-                        {uploading ? 'Uploading...' : 'Upload TXT'}
+                        {uploading ? 'Uploading...' : 'Upload File'}
                       </button>
                     </div>
                   </div>
@@ -1220,12 +1227,12 @@ export default function AiSettingsScreen({ setScreen }) {
                       </div>
 
                       <h3 className="mt-4 font-black text-slate-950">
-                        Drop TXT file here or browse
+                        Drop the file here or browse
                       </h3>
 
                       <p className="mt-2 text-sm text-slate-500">
-                        AI indexing currently supports TXT files. PDF, DOCX,
-                        CSV, and XLSX support is coming soon.
+                        AI indexing currently supports TXT, PDF, DOCX, and CSV
+                        files.
                       </p>
                     </div>
 
@@ -1296,11 +1303,11 @@ export default function AiSettingsScreen({ setScreen }) {
                                   </button>
                                 )}
 
-                                {isComingSoonDocument(doc) && (
+                                {/* {isComingSoonDocument(doc) && (
                                   <span className="rounded-full bg-amber-50 px-3 py-1 text-[11px] font-black text-amber-700">
                                     Indexing Soon
                                   </span>
-                                )}
+                                )} */}
 
                                 <button
                                   type="button"

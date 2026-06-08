@@ -1,26 +1,32 @@
-import { useEffect, useMemo, useState } from "react";
-import { supabase } from "../lib/supabaseClient";
+import { useEffect, useMemo, useState } from 'react';
+import { supabase } from '../lib/supabaseClient';
+import mammoth from 'mammoth';
+import * as pdfjsLib from 'pdfjs-dist';
+import { getDocument, GlobalWorkerOptions } from 'pdfjs-dist';
+import pdfWorker from 'pdfjs-dist/build/pdf.worker.mjs?url';
 
-const SELECTED_BOT_KEY = "nexora_selected_bot_id";
+GlobalWorkerOptions.workerSrc = pdfWorker;
+
+const SELECTED_BOT_KEY = 'nexora_selected_bot_id';
 
 const DEFAULT_AI_SETTINGS = {
-  ai_name: "Customer Support AI",
-  company_name: "",
-  role_description: "Customer support assistant",
-  default_language: "id",
-  tone: "professional",
+  ai_name: 'Customer Support AI',
+  company_name: '',
+  role_description: 'Customer support assistant',
+  default_language: 'id',
+  tone: 'professional',
 
   // Structured Identity
-  agent_role: "",
-  department: "",
-  primary_audience: "",
+  agent_role: '',
+  department: '',
+  primary_audience: '',
 
   // Structured Behavior
-  response_style: "Helpful and concise",
-  empathy_level: "Medium",
-  formality_level: "Professional",
-  knowledge_mode: "Approved Knowledge Only",
-  unknown_answer_behavior: "Use fallback and offer handoff when needed.",
+  response_style: 'Helpful and concise',
+  empathy_level: 'Medium',
+  formality_level: 'Professional',
+  knowledge_mode: 'Approved Knowledge Only',
+  unknown_answer_behavior: 'Use fallback and offer handoff when needed.',
 
   // Structured Guardrails
   forbidden_topics: [],
@@ -29,17 +35,17 @@ const DEFAULT_AI_SETTINGS = {
   never_promise: [],
   restricted_claims: [],
 
-  custom_instruction: "",
+  custom_instruction: '',
 
   main_instruction:
-    "Anda adalah AI customer support. Jawab pertanyaan customer berdasarkan knowledge base yang tersedia.",
-  business_context: "",
+    'Anda adalah AI customer support. Jawab pertanyaan customer berdasarkan knowledge base yang tersedia.',
+  business_context: '',
   restrictions:
-    "Jangan mengarang informasi. Jangan menjanjikan harga, diskon, timeline, atau scope implementasi jika tidak tersedia di knowledge base. Jika informasi tidak tersedia, arahkan customer ke agent manusia.",
+    'Jangan mengarang informasi. Jangan menjanjikan harga, diskon, timeline, atau scope implementasi jika tidak tersedia di knowledge base. Jika informasi tidak tersedia, arahkan customer ke agent manusia.',
   fallback_message:
-    "Informasi tersebut belum tersedia di knowledge base saya. Saya bisa bantu teruskan ke agent.",
+    'Informasi tersebut belum tersedia di knowledge base saya. Saya bisa bantu teruskan ke agent.',
 
-  answer_length: "medium",
+  answer_length: 'medium',
 
   // Existing fields used by old UI
   use_bullets: true,
@@ -63,17 +69,17 @@ const DEFAULT_AI_SETTINGS = {
   handoff_when_customer_asks_human: true,
   handoff_for_pricing_proposal: true,
 
-  handoff_target: "support_agent",
+  handoff_target: 'support_agent',
 
   is_active: true,
 };
 
 const STRUCTURED_ARRAY_FIELDS = [
-  "forbidden_topics",
-  "sensitive_topics",
-  "escalation_topics",
-  "never_promise",
-  "restricted_claims",
+  'forbidden_topics',
+  'sensitive_topics',
+  'escalation_topics',
+  'never_promise',
+  'restricted_claims',
 ];
 
 const normalizeArrayField = (value) => {
@@ -81,7 +87,7 @@ const normalizeArrayField = (value) => {
     return value.map((item) => String(item).trim()).filter(Boolean);
   }
 
-  if (typeof value === "string" && value.trim()) {
+  if (typeof value === 'string' && value.trim()) {
     try {
       const parsed = JSON.parse(value);
 
@@ -90,7 +96,7 @@ const normalizeArrayField = (value) => {
       }
     } catch (_err) {
       return value
-        .split(",")
+        .split(',')
         .map((item) => item.trim())
         .filter(Boolean);
     }
@@ -202,7 +208,7 @@ export default function useAiSettingsData() {
   const [loading, setLoading] = useState(true);
   const [savingSettings, setSavingSettings] = useState(false);
   const [savingArticle, setSavingArticle] = useState(false);
-  const [error, setError] = useState("");
+  const [error, setError] = useState('');
 
   const [workspace, setWorkspace] = useState(null);
   const [activeBot, setActiveBot] = useState(null);
@@ -222,11 +228,11 @@ export default function useAiSettingsData() {
     if (userError) throw userError;
 
     if (!user) {
-      throw new Error("User belum login. Silakan login Supabase Auth dulu.");
+      throw new Error('User belum login. Silakan login Supabase Auth dulu.');
     }
 
     const { data: memberships, error: membershipError } = await supabase
-      .from("workspace_members")
+      .from('workspace_members')
       .select(
         `
         id,
@@ -239,10 +245,10 @@ export default function useAiSettingsData() {
           plan,
           status
         )
-      `
+      `,
       )
-      .eq("profile_id", user.id)
-      .eq("status", "active")
+      .eq('profile_id', user.id)
+      .eq('status', 'active')
       .limit(1);
 
     if (membershipError) throw membershipError;
@@ -250,31 +256,31 @@ export default function useAiSettingsData() {
     const currentWorkspace = memberships?.[0]?.workspace;
 
     if (!currentWorkspace?.id) {
-      throw new Error("Workspace aktif tidak ditemukan.");
+      throw new Error('Workspace aktif tidak ditemukan.');
     }
 
     const { data: bots, error: botsError } = await supabase
-      .from("bots")
-      .select("id, name, status, bot_type, workspace_id, created_at")
-      .eq("workspace_id", currentWorkspace.id)
-      .order("created_at", { ascending: false });
+      .from('bots')
+      .select('id, name, status, bot_type, workspace_id, created_at')
+      .eq('workspace_id', currentWorkspace.id)
+      .order('created_at', { ascending: false });
 
     if (botsError) throw botsError;
 
     const botRows = bots || [];
 
     if (botRows.length === 0) {
-      throw new Error("Bot aktif tidak ditemukan.");
+      throw new Error('Bot aktif tidak ditemukan.');
     }
 
     const storedBotId = localStorage.getItem(SELECTED_BOT_KEY);
     const storedBot = botRows.find((bot) => bot.id === storedBotId);
 
-    const activeBots = botRows.filter((bot) => bot.status === "active");
+    const activeBots = botRows.filter((bot) => bot.status === 'active');
     const selectedBot = storedBot || activeBots[0] || botRows[0] || null;
 
     if (!selectedBot) {
-      throw new Error("Bot aktif tidak ditemukan.");
+      throw new Error('Bot aktif tidak ditemukan.');
     }
 
     localStorage.setItem(SELECTED_BOT_KEY, selectedBot.id);
@@ -287,7 +293,7 @@ export default function useAiSettingsData() {
 
   const fetchAiSettingsData = async () => {
     setLoading(true);
-    setError("");
+    setError('');
 
     try {
       const { workspace, bot } = await getCurrentWorkspaceAndBot();
@@ -296,9 +302,9 @@ export default function useAiSettingsData() {
       setActiveBot(bot);
 
       const { data: settingRow, error: settingError } = await supabase
-        .from("ai_settings")
-        .select("*")
-        .eq("bot_id", bot.id)
+        .from('ai_settings')
+        .select('*')
+        .eq('bot_id', bot.id)
         .maybeSingle();
 
       if (settingError) throw settingError;
@@ -308,23 +314,23 @@ export default function useAiSettingsData() {
       } else {
         setSettings(
           normalizeSettingsRow({
-            ai_name: bot.name ? `${bot.name} AI` : "Customer Support AI",
-          })
+            ai_name: bot.name ? `${bot.name} AI` : 'Customer Support AI',
+          }),
         );
       }
 
       const { data: articleRows, error: articleError } = await supabase
-        .from("knowledge_articles")
-        .select("*")
-        .eq("bot_id", bot.id)
-        .order("updated_at", { ascending: false });
+        .from('knowledge_articles')
+        .select('*')
+        .eq('bot_id', bot.id)
+        .order('updated_at', { ascending: false });
 
       if (articleError) throw articleError;
 
       setArticles(articleRows || []);
 
       const { data: documentRows, error: documentError } = await supabase
-        .from("knowledge_documents")
+        .from('knowledge_documents')
         .select(
           `
           id,
@@ -348,10 +354,10 @@ export default function useAiSettingsData() {
           indexed_at,
           created_at,
           updated_at
-        `
+        `,
         )
-        .eq("bot_id", bot.id)
-        .order("uploaded_at", { ascending: false });
+        .eq('bot_id', bot.id)
+        .order('uploaded_at', { ascending: false });
 
       if (documentError) throw documentError;
 
@@ -367,7 +373,7 @@ export default function useAiSettingsData() {
       }
 
       const { data: chunkRows, error: chunkError } = await supabase
-        .from("knowledge_chunks")
+        .from('knowledge_chunks')
         .select(
           `
           id,
@@ -385,17 +391,17 @@ export default function useAiSettingsData() {
           metadata,
           created_at,
           updated_at
-        `
+        `,
         )
-        .in("document_id", documentIds)
-        .order("chunk_index", { ascending: true });
+        .in('document_id', documentIds)
+        .order('chunk_index', { ascending: true });
 
       if (chunkError) throw chunkError;
 
       setChunks(chunkRows || []);
     } catch (err) {
       console.error(err);
-      setError(err?.message || "Failed to fetch AI settings data.");
+      setError(err?.message || 'Failed to fetch AI settings data.');
     } finally {
       setLoading(false);
     }
@@ -410,43 +416,43 @@ export default function useAiSettingsData() {
           : value,
       };
 
-      if (field === "use_bullets") {
+      if (field === 'use_bullets') {
         next.use_bullet_points = value;
       }
 
-      if (field === "use_bullet_points") {
+      if (field === 'use_bullet_points') {
         next.use_bullets = value;
       }
 
-      if (field === "ask_follow_up") {
+      if (field === 'ask_follow_up') {
         next.ask_follow_up_question = value;
       }
 
-      if (field === "ask_follow_up_question") {
+      if (field === 'ask_follow_up_question') {
         next.ask_follow_up = value;
       }
 
-      if (field === "show_sources") {
+      if (field === 'show_sources') {
         next.show_knowledge_sources = value;
       }
 
-      if (field === "show_knowledge_sources") {
+      if (field === 'show_knowledge_sources') {
         next.show_sources = value;
       }
 
-      if (field === "handoff_when_customer_requests_agent") {
+      if (field === 'handoff_when_customer_requests_agent') {
         next.handoff_when_customer_asks_human = value;
       }
 
-      if (field === "handoff_when_customer_asks_human") {
+      if (field === 'handoff_when_customer_asks_human') {
         next.handoff_when_customer_requests_agent = value;
       }
 
-      if (field === "handoff_when_pricing_request") {
+      if (field === 'handoff_when_pricing_request') {
         next.handoff_for_pricing_proposal = value;
       }
 
-      if (field === "handoff_for_pricing_proposal") {
+      if (field === 'handoff_for_pricing_proposal') {
         next.handoff_when_pricing_request = value;
       }
 
@@ -456,7 +462,7 @@ export default function useAiSettingsData() {
 
   const saveSettings = async () => {
     setSavingSettings(true);
-    setError("");
+    setError('');
 
     try {
       let currentBot = activeBot;
@@ -480,9 +486,9 @@ export default function useAiSettingsData() {
       delete payload.created_at;
 
       const { data, error: upsertError } = await supabase
-        .from("ai_settings")
+        .from('ai_settings')
         .upsert(payload, {
-          onConflict: "bot_id",
+          onConflict: 'bot_id',
         })
         .select()
         .single();
@@ -494,7 +500,7 @@ export default function useAiSettingsData() {
       return data;
     } catch (err) {
       console.error(err);
-      setError(err?.message || "Failed to save AI settings.");
+      setError(err?.message || 'Failed to save AI settings.');
       throw err;
     } finally {
       setSavingSettings(false);
@@ -503,7 +509,7 @@ export default function useAiSettingsData() {
 
   const createArticle = async ({ title, category, content, tags, status }) => {
     setSavingArticle(true);
-    setError("");
+    setError('');
 
     try {
       let currentBot = activeBot;
@@ -517,26 +523,26 @@ export default function useAiSettingsData() {
         setActiveBot(result.bot);
       }
 
-      const cleanTitle = String(title || "").trim();
-      const cleanContent = String(content || "").trim();
+      const cleanTitle = String(title || '').trim();
+      const cleanContent = String(content || '').trim();
 
-      if (!cleanTitle) throw new Error("Article title wajib diisi.");
-      if (!cleanContent) throw new Error("Article content wajib diisi.");
+      if (!cleanTitle) throw new Error('Article title wajib diisi.');
+      if (!cleanContent) throw new Error('Article content wajib diisi.');
 
-      const tagArray = String(tags || "")
-        .split(",")
+      const tagArray = String(tags || '')
+        .split(',')
         .map((tag) => tag.trim())
         .filter(Boolean);
 
       const { data, error: createError } = await supabase
-        .from("knowledge_articles")
+        .from('knowledge_articles')
         .insert({
           bot_id: currentBot.id,
           title: cleanTitle,
-          category: String(category || "").trim() || null,
+          category: String(category || '').trim() || null,
           content: cleanContent,
           tags: tagArray,
-          status: status || "draft",
+          status: status || 'draft',
         })
         .select()
         .single();
@@ -548,7 +554,7 @@ export default function useAiSettingsData() {
       return data;
     } catch (err) {
       console.error(err);
-      setError(err?.message || "Failed to create article.");
+      setError(err?.message || 'Failed to create article.');
       throw err;
     } finally {
       setSavingArticle(false);
@@ -556,62 +562,62 @@ export default function useAiSettingsData() {
   };
 
   const updateArticleStatus = async (articleId, status) => {
-    setError("");
+    setError('');
 
     try {
       if (!activeBot?.id) {
-        throw new Error("Bot aktif belum tersedia.");
+        throw new Error('Bot aktif belum tersedia.');
       }
 
       const { error: updateError } = await supabase
-        .from("knowledge_articles")
+        .from('knowledge_articles')
         .update({
           status,
           updated_at: new Date().toISOString(),
         })
-        .eq("id", articleId)
-        .eq("bot_id", activeBot.id);
+        .eq('id', articleId)
+        .eq('bot_id', activeBot.id);
 
       if (updateError) throw updateError;
 
       await fetchAiSettingsData();
     } catch (err) {
       console.error(err);
-      setError(err?.message || "Failed to update article status.");
+      setError(err?.message || 'Failed to update article status.');
       throw err;
     }
   };
 
   const deleteArticle = async (articleId) => {
-    setError("");
+    setError('');
 
     try {
       if (!activeBot?.id) {
-        throw new Error("Bot aktif belum tersedia.");
+        throw new Error('Bot aktif belum tersedia.');
       }
 
       const { error: deleteError } = await supabase
-        .from("knowledge_articles")
+        .from('knowledge_articles')
         .delete()
-        .eq("id", articleId)
-        .eq("bot_id", activeBot.id);
+        .eq('id', articleId)
+        .eq('bot_id', activeBot.id);
 
       if (deleteError) throw deleteError;
 
       await fetchAiSettingsData();
     } catch (err) {
       console.error(err);
-      setError(err?.message || "Failed to delete article.");
+      setError(err?.message || 'Failed to delete article.');
       throw err;
     }
   };
 
   const uploadKnowledgeDocument = async (file) => {
-    setError("");
+    setError('');
 
     try {
       if (!file) {
-        throw new Error("File belum dipilih.");
+        throw new Error('File belum dipilih.');
       }
 
       let currentWorkspace = workspace;
@@ -627,12 +633,12 @@ export default function useAiSettingsData() {
         setActiveBot(currentBot);
       }
 
-      const allowedExtensions = ["txt"];
-      const fileExtension = file.name.split(".").pop()?.toLowerCase();
+      const allowedExtensions = ['txt', 'pdf', 'docx', 'csv'];
+      const fileExtension = file.name.split('.').pop()?.toLowerCase();
 
       if (!allowedExtensions.includes(fileExtension)) {
         throw new Error(
-          "AI indexing untuk MVP saat ini hanya mendukung file TXT. PDF, DOCX, CSV, dan XLSX akan didukung pada fase berikutnya."
+          'AI indexing untuk MVP saat ini hanya mendukung file TXT. PDF, DOCX, dan CSV.',
         );
       }
 
@@ -651,30 +657,30 @@ export default function useAiSettingsData() {
       if (userError) throw userError;
 
       if (!user) {
-        throw new Error("User belum login.");
+        throw new Error('User belum login.');
       }
 
       const safeFileName = file.name
-        .replace(/\s+/g, "-")
-        .replace(/[^a-zA-Z0-9._-]/g, "")
+        .replace(/\s+/g, '-')
+        .replace(/[^a-zA-Z0-9._-]/g, '')
         .toLowerCase();
 
       const storagePath = `${currentWorkspace.id}/${currentBot.id}/${Date.now()}-${safeFileName}`;
 
       const { error: uploadError } = await supabase.storage
-        .from("knowledge-files")
+        .from('knowledge-files')
         .upload(storagePath, file, {
-          cacheControl: "3600",
+          cacheControl: '3600',
           upsert: false,
-          contentType: file.type || "text/plain",
+          contentType: file.type || 'text/plain',
         });
 
       if (uploadError) throw uploadError;
 
-      const documentTitle = file.name.replace(/\.[^/.]+$/, "");
+      const documentTitle = file.name.replace(/\.[^/.]+$/, '');
 
       const { error: insertError } = await supabase
-        .from("knowledge_documents")
+        .from('knowledge_documents')
         .insert({
           workspace_id: currentWorkspace.id,
           bot_id: currentBot.id,
@@ -683,15 +689,15 @@ export default function useAiSettingsData() {
           file_type: file.type || fileExtension,
           file_size_bytes: file.size,
           file_url: storagePath,
-          source_type: "upload",
+          source_type: 'upload',
           title: documentTitle,
-          description: "TXT document uploaded and awaiting indexing.",
-          status: "uploaded",
+          description: 'Document uploaded and awaiting indexing.',
+          status: 'uploaded',
           total_chunks: 0,
           indexed_chunks: 0,
           metadata: {
             originalFileName: file.name,
-            storageBucket: "knowledge-files",
+            storageBucket: 'knowledge-files',
             storagePath,
             extension: fileExtension,
           },
@@ -703,70 +709,110 @@ export default function useAiSettingsData() {
       await fetchAiSettingsData();
     } catch (err) {
       console.error(err);
-      setError(err?.message || "Failed to upload knowledge document.");
+      setError(err?.message || 'Failed to upload knowledge document.');
       throw err;
     }
   };
 
   const indexTextKnowledgeDocument = async (document) => {
-    setError("");
+    GlobalWorkerOptions.workerSrc = new URL(
+      'pdfjs-dist/build/pdf.worker.mjs',
+      import.meta.url,
+    ).toString();
+
+    setError('');
 
     try {
       if (!document?.id) {
-        throw new Error("Document tidak valid.");
+        throw new Error('Document tidak valid.');
       }
 
-      const allowedStatuses = ["uploaded", "indexed", "failed"];
+      const allowedStatuses = ['uploaded', 'indexed', 'failed'];
 
       if (!allowedStatuses.includes(document.status)) {
         throw new Error(
-          "Document hanya bisa di-index jika statusnya Uploaded, Indexed, atau Failed."
+          'Document hanya bisa di-index jika statusnya Uploaded, Indexed, atau Failed.',
         );
       }
 
       const fileExtension =
         document.metadata?.extension ||
-        document.file_name?.split(".").pop()?.toLowerCase();
+        document.file_name?.split('.').pop()?.toLowerCase();
 
-      if (fileExtension !== "txt") {
+      if (!['txt', 'pdf', 'docx', 'csv'].includes(fileExtension)) {
         throw new Error(
-          "AI indexing saat ini hanya mendukung file .txt. PDF, DOCX, CSV, dan XLSX akan didukung pada fase berikutnya."
+          'AI indexing saat ini hanya mendukung file .txt, .pdf, .docx. dan .csv',
         );
       }
 
       const storagePath = document.file_url || document.metadata?.storagePath;
 
       if (!storagePath) {
-        throw new Error("Storage path document tidak ditemukan.");
+        throw new Error('Storage path document tidak ditemukan.');
       }
 
       const { error: markProcessingError } = await supabase
-        .from("knowledge_documents")
+        .from('knowledge_documents')
         .update({
-          status: "processing",
+          status: 'processing',
           processing_started_at: new Date().toISOString(),
           error_message: null,
           updated_at: new Date().toISOString(),
         })
-        .eq("id", document.id);
+        .eq('id', document.id);
 
       if (markProcessingError) throw markProcessingError;
 
       const { data: fileBlob, error: downloadError } = await supabase.storage
-        .from("knowledge-files")
+        .from('knowledge-files')
         .download(storagePath);
 
       if (downloadError) throw downloadError;
 
-      const textContent = await fileBlob.text();
+      let textContent = '';
+
+      if (fileExtension === 'txt' || fileExtension === 'csv') {
+        textContent = await fileBlob.text();
+      } else if (fileExtension === 'pdf') {
+        const arrayBuffer = await fileBlob.arrayBuffer();
+
+        const pdf = await pdfjsLib.getDocument({
+          data: arrayBuffer,
+        }).promise;
+
+        const pages = [];
+
+        for (let pageNumber = 1; pageNumber <= pdf.numPages; pageNumber++) {
+          const page = await pdf.getPage(pageNumber);
+
+          const pageContent = await page.getTextContent();
+
+          const pageText = pageContent.items
+            .map((item) => item.str)
+            .filter(Boolean)
+            .join(' ');
+
+          pages.push(pageText);
+        }
+
+        textContent = pages.join('\n');
+      } else if (fileExtension === 'docx') {
+        const arrayBuffer = await fileBlob.arrayBuffer();
+
+        const result = await mammoth.extractRawText({
+          arrayBuffer,
+        });
+
+        textContent = result.value;
+      }
 
       const cleanText = textContent
-        .replace(/\r\n/g, "\n")
-        .replace(/\n{3,}/g, "\n\n")
+        .replace(/\r\n/g, '\n')
+        .replace(/\n{3,}/g, '\n\n')
         .trim();
 
       if (!cleanText) {
-        throw new Error("Isi file kosong atau tidak bisa dibaca.");
+        throw new Error('Isi file kosong atau tidak bisa dibaca.');
       }
 
       const chunkSize = 800;
@@ -781,7 +827,7 @@ export default function useAiSettingsData() {
       }
 
       if (chunksToCreate.length === 0) {
-        throw new Error("Tidak ada chunk yang berhasil dibuat.");
+        throw new Error('Tidak ada chunk yang berhasil dibuat.');
       }
 
       const chunkPayload = chunksToCreate.map((content, index) => ({
@@ -792,12 +838,12 @@ export default function useAiSettingsData() {
         title: `${document.title || document.file_name} - Chunk ${index + 1}`,
         content,
         token_count: Math.ceil(content.length / 4),
-        embedding_provider: "manual_txt_index",
-        embedding_model: "manual-text-chunk-v1",
+        embedding_provider: 'manual_txt_index',
+        embedding_model: 'manual-text-chunk-v1',
         embedding_id: `manual_${document.id}_${index}`,
-        status: "embedded",
+        status: 'embedded',
         metadata: {
-          source: "manual_txt_index",
+          source: 'manual_txt_index',
           fileName: document.file_name,
           chunkSize,
           reindexedAt: new Date().toISOString(),
@@ -805,35 +851,35 @@ export default function useAiSettingsData() {
       }));
 
       const { error: deleteOldChunksError } = await supabase
-        .from("knowledge_chunks")
+        .from('knowledge_chunks')
         .delete()
-        .eq("document_id", document.id);
+        .eq('document_id', document.id);
 
       if (deleteOldChunksError) throw deleteOldChunksError;
 
       const { error: insertChunksError } = await supabase
-        .from("knowledge_chunks")
+        .from('knowledge_chunks')
         .insert(chunkPayload);
 
       if (insertChunksError) throw insertChunksError;
 
       const { error: updateDocumentError } = await supabase
-        .from("knowledge_documents")
+        .from('knowledge_documents')
         .update({
-          status: "indexed",
+          status: 'indexed',
           total_chunks: chunksToCreate.length,
           indexed_chunks: chunksToCreate.length,
           indexed_at: new Date().toISOString(),
           error_message: null,
           metadata: {
             ...(document.metadata || {}),
-            indexedBy: "manual_txt_index",
+            indexedBy: 'manual_txt_index',
             indexedAt: new Date().toISOString(),
             chunkSize,
           },
           updated_at: new Date().toISOString(),
         })
-        .eq("id", document.id);
+        .eq('id', document.id);
 
       if (updateDocumentError) throw updateDocumentError;
 
@@ -843,16 +889,16 @@ export default function useAiSettingsData() {
 
       if (document?.id) {
         await supabase
-          .from("knowledge_documents")
+          .from('knowledge_documents')
           .update({
-            status: "failed",
-            error_message: err?.message || "Failed to index document.",
+            status: 'failed',
+            error_message: err?.message || 'Failed to index document.',
             updated_at: new Date().toISOString(),
           })
-          .eq("id", document.id);
+          .eq('id', document.id);
       }
 
-      setError(err?.message || "Failed to index document.");
+      setError(err?.message || 'Failed to index document.');
       await fetchAiSettingsData();
 
       throw err;
@@ -860,33 +906,34 @@ export default function useAiSettingsData() {
   };
 
   const deleteKnowledgeDocument = async (document) => {
-    setError("");
+    setError('');
 
     try {
       if (!document?.id) {
-        throw new Error("Document tidak valid.");
+        throw new Error('Document tidak valid.');
       }
 
       if (!activeBot?.id) {
-        throw new Error("Bot aktif belum tersedia.");
+        throw new Error('Bot aktif belum tersedia.');
       }
 
       const storagePath = document.file_url || document.metadata?.storagePath;
-      const storageBucket = document.metadata?.storageBucket || "knowledge-files";
+      const storageBucket =
+        document.metadata?.storageBucket || 'knowledge-files';
 
       const { error: deleteChunksError } = await supabase
-        .from("knowledge_chunks")
+        .from('knowledge_chunks')
         .delete()
-        .eq("document_id", document.id)
-        .eq("bot_id", activeBot.id);
+        .eq('document_id', document.id)
+        .eq('bot_id', activeBot.id);
 
       if (deleteChunksError) throw deleteChunksError;
 
       const { error: deleteDocumentError } = await supabase
-        .from("knowledge_documents")
+        .from('knowledge_documents')
         .delete()
-        .eq("id", document.id)
-        .eq("bot_id", activeBot.id);
+        .eq('id', document.id)
+        .eq('bot_id', activeBot.id);
 
       if (deleteDocumentError) throw deleteDocumentError;
 
@@ -896,14 +943,14 @@ export default function useAiSettingsData() {
           .remove([storagePath]);
 
         if (removeStorageError) {
-          console.warn("[Storage delete warning]", removeStorageError);
+          console.warn('[Storage delete warning]', removeStorageError);
         }
       }
 
       await fetchAiSettingsData();
     } catch (err) {
       console.error(err);
-      setError(err?.message || "Failed to delete knowledge document.");
+      setError(err?.message || 'Failed to delete knowledge document.');
       throw err;
     }
   };
@@ -926,19 +973,19 @@ export default function useAiSettingsData() {
     };
 
     window.addEventListener(
-      "nexora:selected-bot-changed",
-      handleSelectedBotChanged
+      'nexora:selected-bot-changed',
+      handleSelectedBotChanged,
     );
 
-    window.addEventListener("nexora:bot-created", handleBotCreated);
+    window.addEventListener('nexora:bot-created', handleBotCreated);
 
     return () => {
       window.removeEventListener(
-        "nexora:selected-bot-changed",
-        handleSelectedBotChanged
+        'nexora:selected-bot-changed',
+        handleSelectedBotChanged,
       );
 
-      window.removeEventListener("nexora:bot-created", handleBotCreated);
+      window.removeEventListener('nexora:bot-created', handleBotCreated);
     };
   }, []);
 
@@ -946,37 +993,37 @@ export default function useAiSettingsData() {
     const totalDocuments = documents.length;
 
     const indexedDocuments = documents.filter(
-      (doc) => doc.status === "indexed"
+      (doc) => doc.status === 'indexed',
     ).length;
 
     const processingDocuments = documents.filter(
-      (doc) => doc.status === "processing"
+      (doc) => doc.status === 'processing',
     ).length;
 
     const failedDocuments = documents.filter(
-      (doc) => doc.status === "failed"
+      (doc) => doc.status === 'failed',
     ).length;
 
     const uploadedDocuments = documents.filter(
-      (doc) => doc.status === "uploaded"
+      (doc) => doc.status === 'uploaded',
     ).length;
 
     const totalChunks = documents.reduce(
       (sum, doc) => sum + Number(doc.total_chunks || 0),
-      0
+      0,
     );
 
     const indexedChunks = documents.reduce(
       (sum, doc) => sum + Number(doc.indexed_chunks || 0),
-      0
+      0,
     );
 
     const publishedArticles = articles.filter(
-      (article) => article.status === "published"
+      (article) => article.status === 'published',
     ).length;
 
     const draftArticles = articles.filter(
-      (article) => article.status === "draft"
+      (article) => article.status === 'draft',
     ).length;
 
     const knowledgeItems = totalDocuments + articles.length;
