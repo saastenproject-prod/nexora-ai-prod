@@ -7,6 +7,7 @@ import {
   Bot,
   Pencil,
   MessageCircle,
+  Puzzle,
 } from '../lib/icons';
 import useAiSettingsData from '../hooks/useAiSettingsData';
 
@@ -16,6 +17,17 @@ const DEFAULT_ARTICLE_FORM = {
   tags: '',
   content: '',
   status: 'draft',
+};
+
+const DEFAULT_FEATURE_FORM = {
+  template_feature_id: '',
+  feature_name: '',
+  feature_key: '',
+  feature_type: '',
+  description: '',
+  required_data: '',
+  is_enabled: true,
+  configuration_json: '{}',
 };
 
 const arrayToText = (value) => {
@@ -88,6 +100,7 @@ export default function AiSettingsScreen({ setScreen }) {
     activeBot,
     settings,
     articles,
+    features,
     documents,
     stats,
 
@@ -97,6 +110,12 @@ export default function AiSettingsScreen({ setScreen }) {
     createArticle,
     updateArticleStatus,
     deleteArticle,
+
+    toggleFeature,
+    templateFeatures,
+    createFeature,
+    updateFeature,
+    deleteFeature,
 
     uploadKnowledgeDocument,
     indexTextKnowledgeDocument,
@@ -112,6 +131,13 @@ export default function AiSettingsScreen({ setScreen }) {
   const [saveStatus, setSaveStatus] = useState('');
   const [articleError, setArticleError] = useState('');
   const [articleForm, setArticleForm] = useState(DEFAULT_ARTICLE_FORM);
+  const [showCreateFeatureModal, setShowCreateFeatureModal] = useState(false);
+  const [featureForm, setFeatureForm] = useState(DEFAULT_FEATURE_FORM);
+  const [creatingFeature, setCreatingFeature] = useState(false);
+  const [editingFeature, setEditingFeature] = useState(null);
+  const [deletingFeatureId, setDeletingFeatureId] = useState(null);
+  const [togglingFeatureId, setTogglingFeatureId] = useState(null);
+  const [loadingMessage, setLoadingMessage] = useState('');
 
   const handleOpenFilePicker = () => {
     fileInputRef.current?.click();
@@ -217,6 +243,137 @@ export default function AiSettingsScreen({ setScreen }) {
     if (!confirmed) return;
 
     await deleteArticle(article.id);
+  };
+
+  const closeFeatureModal = () => {
+    setEditingFeature(null);
+
+    setFeatureForm(DEFAULT_FEATURE_FORM);
+
+    setShowCreateFeatureModal(false);
+  };
+
+  const handleAddFeature = () => {
+    setEditingFeature(null);
+    setFeatureForm(DEFAULT_FEATURE_FORM);
+    setShowCreateFeatureModal(true);
+  };
+
+  const handleTemplateChange = (templateId) => {
+    const template = templateFeatures.find((item) => item.id === templateId);
+
+    if (!template) {
+      setFeatureForm((prev) => ({
+        ...prev,
+        template_feature_id: '',
+      }));
+      return;
+    }
+
+    setFeatureForm({
+      template_feature_id: template.id,
+      feature_name: template.feature_name || '',
+      feature_key: template.feature_key || '',
+      feature_type: template.feature_type || '',
+      description: template.description || '',
+      required_data: template.required_data || '',
+      is_enabled: template.is_enabled ?? true,
+      configuration_json: JSON.stringify(
+        template.configuration_json || {},
+        null,
+        2,
+      ),
+    });
+  };
+
+  const handleSaveFeature = async (e) => {
+    e.preventDefault();
+
+    if (!featureForm.template_feature_id) {
+      alert('Template Feature is required.');
+      return;
+    }
+
+    if (!featureForm.feature_name?.trim()) {
+      alert('Feature Name is required.');
+      return;
+    }
+
+    if (!featureForm.description?.trim()) {
+      alert('Description is required.');
+      return;
+    }
+    try {
+      setCreatingFeature(true);
+
+      if (editingFeature) {
+        await updateFeature(editingFeature.id, featureForm);
+      } else {
+        await createFeature(featureForm);
+      }
+
+      setFeatureForm(DEFAULT_FEATURE_FORM);
+      setEditingFeature(null);
+      setShowCreateFeatureModal(false);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setCreatingFeature(false);
+    }
+  };
+
+  const handleConfigureFeature = (feature) => {
+    setEditingFeature(feature);
+
+    setFeatureForm({
+      template_feature_id: feature.template_feature_id || '',
+      feature_name: feature.feature_name || '',
+      description: feature.description || '',
+      configuration_json: JSON.stringify(
+        feature.configuration_json || {},
+        null,
+        2,
+      ),
+      is_enabled: feature.is_enabled ?? true,
+    });
+
+    setShowCreateFeatureModal(true);
+  };
+
+  const handleToggleFeature = async (feature) => {
+    if (togglingFeatureId === feature.id) return;
+    setLoadingMessage('Updating feature...');
+
+    try {
+      setTogglingFeatureId(feature.id);
+
+      await toggleFeature(feature);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setTogglingFeatureId(null);
+      setLoadingMessage('');
+    }
+  };
+
+  const handleDeleteFeature = async (feature) => {
+    const confirmed = window.confirm(
+      `Delete feature "${feature.feature_name}"?`,
+    );
+
+    if (!confirmed) return;
+
+    if (deletingFeatureId === feature.id) return;
+
+    try {
+      setDeletingFeatureId(feature.id);
+      setLoadingMessage('Deleting feature...');
+
+      await deleteFeature(feature.id);
+    } finally {
+      setDeletingFeatureId(null);
+      setLoadingMessage('');
+    }
   };
 
   const formatStatus = (status) => {
@@ -351,6 +508,7 @@ export default function AiSettingsScreen({ setScreen }) {
               label: 'Response & Handoff',
               icon: MessageCircle,
             },
+            { id: 'features', label: 'Features', icon: Puzzle },
             { id: 'knowledge', label: 'Knowledge', icon: BookOpen },
           ].map((tab) => {
             const Icon = tab.icon;
@@ -1126,6 +1284,116 @@ export default function AiSettingsScreen({ setScreen }) {
             </div>
           )}
 
+          {activeTab === 'features' && (
+            <div className="space-y-5 animate-fadeIn">
+              <div className="rounded-[2rem] border border-slate-200 bg-white shadow-sm overflow-hidden">
+                <div className="p-6 border-b border-slate-200 flex items-center justify-between">
+                  <div>
+                    <h2 className="text-xl font-black text-slate-950">
+                      Features
+                    </h2>
+
+                    <p className="mt-1 text-sm text-slate-500">
+                      Manage AI capabilities available for this bot.
+                    </p>
+                  </div>
+
+                  <button
+                    onClick={handleAddFeature}
+                    type="button"
+                    className="h-10 px-4 rounded-2xl bg-blue-600 text-white text-sm font-bold hover:bg-blue-700 transition"
+                  >
+                    Add Feature
+                  </button>
+                </div>
+
+                <div className="p-6">
+                  {features.length === 0 ? (
+                    <div className="rounded-3xl border border-slate-200 bg-slate-50 p-8 text-center">
+                      <p className="text-sm font-semibold text-slate-500">
+                        No features found.
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="grid gap-4">
+                      {features.map((feature) => (
+                        <div
+                          key={feature.id}
+                          className="rounded-3xl border border-slate-200 bg-white p-5 hover:bg-slate-50 transition"
+                        >
+                          <div className="flex items-start justify-between gap-4">
+                            <div className="min-w-0">
+                              <div className="flex items-center gap-3">
+                                <h3 className="font-black text-slate-950">
+                                  {feature.feature_name}
+                                </h3>
+
+                                <span
+                                  className={`rounded-full px-3 py-1 text-[11px] font-black ${
+                                    feature.is_enabled
+                                      ? 'bg-emerald-50 text-emerald-700'
+                                      : 'bg-slate-100 text-slate-600'
+                                  }`}
+                                >
+                                  {feature.is_enabled ? 'Enabled' : 'Disabled'}
+                                </span>
+                              </div>
+
+                              <p className="mt-2 text-sm text-slate-500 leading-6">
+                                {feature.description}
+                              </p>
+                            </div>
+
+                            <div className="flex items-center gap-2 shrink-0">
+                              <div className="flex items-center gap-2">
+                                <button
+                                  type="button"
+                                  disabled={togglingFeatureId === feature.id}
+                                  onClick={() => handleToggleFeature(feature)}
+                                  className={`relative inline-flex h-6 w-11 shrink-0 rounded-full border-2 border-transparent transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed ${
+                                    feature.is_enabled
+                                      ? 'bg-blue-600'
+                                      : 'bg-slate-200'
+                                  }`}
+                                >
+                                  <span
+                                    className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-md transition duration-200 ${
+                                      feature.is_enabled
+                                        ? 'translate-x-5'
+                                        : 'translate-x-0'
+                                    }`}
+                                  />
+                                </button>
+                              </div>
+                              <button
+                                type="button"
+                                onClick={() => handleConfigureFeature(feature)}
+                                className="h-9 px-4 rounded-xl border border-blue-100 bg-blue-50 text-blue-600 text-xs font-black hover:bg-blue-100 transition"
+                              >
+                                Configure
+                              </button>
+
+                              <button
+                                type="button"
+                                onClick={() => handleDeleteFeature(feature)}
+                                disabled={deletingFeatureId === feature.id}
+                                className="h-9 px-4 rounded-xl border border-red-100 bg-red-50 text-red-600 text-xs font-black hover:bg-red-100 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                              >
+                                {deletingFeatureId === feature.id
+                                  ? 'Deleting...'
+                                  : 'Delete'}
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+
           {activeTab === 'knowledge' && (
             <div className="grid xl:grid-cols-[1fr_420px] gap-5 animate-fadeIn">
               <div className="space-y-5">
@@ -1559,6 +1827,156 @@ export default function AiSettingsScreen({ setScreen }) {
                   </div>
                 </div>
               </aside>
+            </div>
+          )}
+
+          {showCreateFeatureModal && (
+            <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm overflow-y-auto">
+              <div className="min-h-screen p-4 sm:p-6 md:p-8 flex items-start justify-center">
+                <div className="w-full max-w-2xl my-8 rounded-[2rem] bg-white shadow-2xl overflow-hidden">
+                  <div className="border-b border-slate-200 px-6 py-5 flex items-center justify-between">
+                    <h2 className="text-xl font-black text-slate-950">
+                      {editingFeature ? 'Configure Feature' : 'Add Feature'}
+                    </h2>
+                  </div>
+
+                  <form onSubmit={handleSaveFeature} className="p-6">
+                    <div className="space-y-6">
+                      <div className="grid md:grid-cols-2 gap-6">
+                        <div className="space-y-5">
+                          <label className="block">
+                            <span className={settingLabelClass}>
+                              Template Feature
+                            </span>
+
+                            <select
+                              value={featureForm.template_feature_id}
+                              onChange={(e) =>
+                                handleTemplateChange(e.target.value)
+                              }
+                              className={settingInputClass}
+                            >
+                              <option value="">Select Template</option>
+
+                              {templateFeatures.map((template) => (
+                                <option key={template.id} value={template.id}>
+                                  {template.feature_name}
+                                </option>
+                              ))}
+                            </select>
+                          </label>
+
+                          <label className="block">
+                            <span className={settingLabelClass}>
+                              Feature Name
+                            </span>
+
+                            <input
+                              value={featureForm.feature_name}
+                              onChange={(e) =>
+                                setFeatureForm((prev) => ({
+                                  ...prev,
+                                  feature_name: e.target.value,
+                                }))
+                              }
+                              className={settingInputClass}
+                            />
+                          </label>
+
+                          {!editingFeature && (
+                            <div>
+                              <span className={settingLabelClass}>Status</span>
+
+                              <div className="mt-2">
+                                <ToggleSwitch
+                                  checked={featureForm.is_enabled}
+                                  onChange={(value) =>
+                                    setFeatureForm((prev) => ({
+                                      ...prev,
+                                      is_enabled: value,
+                                    }))
+                                  }
+                                  label={
+                                    featureForm.is_enabled
+                                      ? 'Active'
+                                      : 'Inactive'
+                                  }
+                                />
+                              </div>
+                            </div>
+                          )}
+                        </div>
+
+                        <label className="block">
+                          <span className={settingLabelClass}>
+                            Configuration JSON
+                          </span>
+
+                          <textarea
+                            value={featureForm.configuration_json}
+                            onChange={(e) =>
+                              setFeatureForm((prev) => ({
+                                ...prev,
+                                configuration_json: e.target.value,
+                              }))
+                            }
+                            className={`${settingTextareaClass} h-[255px] font-mono text-xs`}
+                          />
+                        </label>
+                      </div>
+
+                      <label className="block">
+                        <span className={settingLabelClass}>Description</span>
+
+                        <textarea
+                          value={featureForm.description}
+                          onChange={(e) =>
+                            setFeatureForm((prev) => ({
+                              ...prev,
+                              description: e.target.value,
+                            }))
+                          }
+                          className={`${settingTextareaClass} h-32`}
+                        />
+                      </label>
+                    </div>
+
+                    <div className="mt-8 flex items-center justify-end gap-3 border-t border-slate-200 pt-5">
+                      <button
+                        type="button"
+                        onClick={closeFeatureModal}
+                        className="h-11 px-5 rounded-2xl border border-slate-200 bg-white text-sm font-bold text-slate-700 hover:bg-slate-50 transition"
+                      >
+                        Cancel
+                      </button>
+
+                      <button
+                        type="submit"
+                        disabled={creatingFeature}
+                        className="h-11 px-5 rounded-2xl bg-blue-600 text-white text-sm font-bold disabled:opacity-60 disabled:cursor-not-allowed"
+                      >
+                        {editingFeature
+                          ? 'Save Changes'
+                          : creatingFeature
+                            ? 'Creating...'
+                            : 'Create Feature'}
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {loadingMessage && (
+            <div className="fixed inset-0 z-[9999] bg-black/30 backdrop-blur-sm flex items-center justify-center">
+              <div className="bg-white rounded-3xl px-8 py-6 shadow-xl flex items-center gap-4">
+                <div className="h-6 w-6 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" />
+
+                <span className="font-semibold text-slate-700">
+                  {loadingMessage}
+                </span>
+              </div>
             </div>
           )}
         </div>

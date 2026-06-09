@@ -215,6 +215,8 @@ export default function useAiSettingsData() {
 
   const [settings, setSettings] = useState(DEFAULT_AI_SETTINGS);
   const [articles, setArticles] = useState([]);
+  const [features, setFeatures] = useState([]);
+  const [templateFeatures, setTemplateFeatures] = useState([]);
 
   const [documents, setDocuments] = useState([]);
   const [chunks, setChunks] = useState([]);
@@ -328,6 +330,25 @@ export default function useAiSettingsData() {
       if (articleError) throw articleError;
 
       setArticles(articleRows || []);
+
+      const { data: featureRows, error: featureError } = await supabase
+        .from('bot_features')
+        .select('*')
+        .eq('bot_id', bot.id)
+        .order('feature_name', { ascending: true });
+
+      if (featureError) throw featureError;
+
+      setFeatures(featureRows || []);
+
+      const { data: templateRows, error: templateError } = await supabase
+        .from('agent_template_features')
+        .select('*')
+        .order('feature_name');
+
+      if (templateError) throw templateError;
+
+      setTemplateFeatures(templateRows || []);
 
       const { data: documentRows, error: documentError } = await supabase
         .from('knowledge_documents')
@@ -955,6 +976,118 @@ export default function useAiSettingsData() {
     }
   };
 
+  const toggleFeature = async (feature) => {
+    setError('');
+
+    try {
+      const { error } = await supabase
+        .from('bot_features')
+        .update({
+          is_enabled: !feature.is_enabled,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', feature.id);
+
+      if (error) throw error;
+
+      await fetchAiSettingsData();
+    } catch (err) {
+      console.error(err);
+      setError(err?.message || 'Failed to update feature.');
+      throw err;
+    }
+  };
+
+  const deleteFeature = async (featureId) => {
+    setError('');
+
+    try {
+      const { error } = await supabase
+        .from('bot_features')
+        .delete()
+        .eq('id', featureId);
+
+      if (error) throw error;
+
+      await fetchAiSettingsData();
+    } catch (err) {
+      console.error(err);
+      setError(err?.message || 'Failed to delete feature.');
+      throw err;
+    }
+  };
+
+  const createFeature = async (payload) => {
+    setError('');
+
+    try {
+      let currentWorkspace = workspace;
+      let currentBot = activeBot;
+
+      if (!currentWorkspace?.id || !currentBot?.id) {
+        const result = await getCurrentWorkspaceAndBot();
+
+        currentWorkspace = result.workspace;
+        currentBot = result.bot;
+      }
+
+      const { error } = await supabase.from('bot_features').insert({
+        workspace_id: currentWorkspace.id,
+        bot_id: currentBot.id,
+
+        feature_name: payload.feature_name,
+
+        template_feature_id: payload.template_feature_id || null,
+
+        feature_key: payload.feature_key || null,
+        feature_type: payload.feature_type || null,
+        description: payload.description || null,
+        required_data: payload.required_data || null,
+        is_enabled: payload.is_enabled,
+
+        configuration_json:
+          typeof payload.configuration_json === 'string'
+            ? JSON.parse(payload.configuration_json || '{}')
+            : payload.configuration_json,
+      });
+
+      if (error) throw error;
+
+      await fetchAiSettingsData();
+    } catch (err) {
+      console.error(err);
+      setError(err?.message || 'Failed to create feature.');
+      throw err;
+    }
+  };
+
+  const updateFeature = async (featureId, payload) => {
+    setError('');
+
+    try {
+      const { error } = await supabase
+        .from('bot_features')
+        .update({
+          feature_name: payload.feature_name,
+          description: payload.description,
+          configuration_json:
+            typeof payload.configuration_json === 'string'
+              ? JSON.parse(payload.configuration_json || '{}')
+              : payload.configuration_json,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', featureId);
+
+      if (error) throw error;
+
+      await fetchAiSettingsData();
+    } catch (err) {
+      console.error(err);
+      setError(err?.message || 'Failed to update feature.');
+      throw err;
+    }
+  };
+
   useEffect(() => {
     fetchAiSettingsData();
 
@@ -1061,6 +1194,8 @@ export default function useAiSettingsData() {
 
     settings,
     articles,
+    features,
+    templateFeatures,
     documents,
     chunks,
     stats,
@@ -1071,6 +1206,11 @@ export default function useAiSettingsData() {
     createArticle,
     updateArticleStatus,
     deleteArticle,
+
+    toggleFeature,
+    createFeature,
+    updateFeature,
+    deleteFeature,
 
     uploadKnowledgeDocument,
     indexTextKnowledgeDocument,
