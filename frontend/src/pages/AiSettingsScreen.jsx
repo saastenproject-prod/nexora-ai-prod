@@ -699,14 +699,6 @@ export default function AiSettingsScreen({ setScreen }) {
                       <option value="general hr">General HR</option>
                       <option value="hrbp">HRBP</option>
                     </select>
-                    {/* <input
-                      value={settings.agent_role || ""}
-                      onChange={(event) =>
-                        updateSettingField("agent_role", event.target.value)
-                      }
-                      className={settingInputClass}
-                      placeholder="HR Specialist"
-                    /> */}
                   </label>
 
                   <label className="block">
