@@ -2,12 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 
 import ChatbotSubnav from "../components/layout/ChatbotSubnav";
 
-import {
-  Bot,
-  MessageCircle,
-  Plus,
-  Workflow,
-} from "../lib/icons";
+import { Bot, MessageCircle, Plus, Workflow } from "../lib/icons";
 
 import { supabase } from "../lib/supabaseClient";
 import useAllChatbotsData from "../hooks/useAllChatbotsData";
@@ -272,12 +267,13 @@ export default function ChannelsScreen({ setScreen }) {
     <div className="flex min-h-screen bg-[#F6F8FC]">
       <ChatbotSubnav setScreen={setScreen} activeMenu="channels" />
 
-      <main className="flex-1 min-w-0">
+      <main className="ml-64 flex-1 min-w-0">
         <div className="sticky top-0 z-20 border-b border-slate-200/80 bg-white/85 backdrop-blur-xl px-8 h-16 flex items-center justify-between">
           <div>
             <h1 className="font-black text-slate-950">Channels</h1>
             <p className="text-xs text-slate-500 mt-1">
-              Connect Nexora agents to external channels such as Meta WhatsApp Cloud API.
+              Connect Nexora agents to external channels such as Meta WhatsApp
+              Cloud API.
             </p>
           </div>
 
@@ -346,7 +342,8 @@ export default function ChannelsScreen({ setScreen }) {
                   WhatsApp / WABA Connection
                 </h2>
                 <p className="text-sm text-slate-500 mt-1">
-                  Choose an agent and configure the Meta WhatsApp Cloud API channel.
+                  Choose an agent and configure the Meta WhatsApp Cloud API
+                  channel.
                 </p>
               </div>
 
@@ -373,7 +370,9 @@ export default function ChannelsScreen({ setScreen }) {
                   {selectedBot && (
                     <div className="mt-3 rounded-2xl bg-blue-50 px-4 py-3">
                       <p className="text-sm font-black text-blue-800">
-                        {selectedBot.name || selectedBot.bot_name || selectedBot.ai_name}
+                        {selectedBot.name ||
+                          selectedBot.bot_name ||
+                          selectedBot.ai_name}
                       </p>
                       <p className="mt-1 text-xs font-semibold text-blue-700 break-all">
                         Bot ID: {selectedBot.id}
@@ -475,7 +474,8 @@ export default function ChannelsScreen({ setScreen }) {
                     className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-700 outline-none focus:border-blue-400 focus:ring-4 focus:ring-blue-50"
                   />
                   <p className="mt-2 text-xs font-semibold text-amber-600">
-                    For POC this can be stored in Supabase. For production, encrypt the token or store it as a secret.
+                    For POC this can be stored in Supabase. For production,
+                    encrypt the token or store it as a secret.
                   </p>
                 </div>
 
@@ -500,7 +500,8 @@ export default function ChannelsScreen({ setScreen }) {
                         Meta Webhook URL
                       </p>
                       <p className="mt-1 text-xs font-semibold text-slate-500">
-                        Use this URL in Meta Developer App webhook configuration.
+                        Use this URL in Meta Developer App webhook
+                        configuration.
                       </p>
                     </div>
 
@@ -527,8 +528,8 @@ export default function ChannelsScreen({ setScreen }) {
                     {saving
                       ? "Saving..."
                       : form.id
-                        ? "Update Connection"
-                        : "Save Connection"}
+                      ? "Update Connection"
+                      : "Save Connection"}
                   </button>
 
                   <button
@@ -601,7 +602,8 @@ export default function ChannelsScreen({ setScreen }) {
 
               {!loadingConnections && connections.length === 0 && (
                 <div className="p-8 text-sm font-semibold text-slate-500">
-                  No WhatsApp connection found. Create your first connection to map WABA to an agent.
+                  No WhatsApp connection found. Create your first connection to
+                  map WABA to an agent.
                 </div>
               )}
 
@@ -651,7 +653,8 @@ export default function ChannelsScreen({ setScreen }) {
                                 relatedBot?.ai_name ||
                                 "Unknown Agent"}
                             </span>
-                            . Incoming WhatsApp messages for this Phone Number ID will be routed to this agent.
+                            . Incoming WhatsApp messages for this Phone Number
+                            ID will be routed to this agent.
                           </p>
 
                           <div className="mt-3 flex flex-wrap gap-2">

@@ -2,7 +2,7 @@ import { sidebarItems } from "../../data/dummyData";
 
 export default function Sidebar({ active, setActive }) {
   return (
-    <aside className="h-screen w-[84px] shrink-0 border-r border-slate-200 bg-white flex flex-col items-center py-5 gap-4">
+    <aside className="fixed left-0 top-0 z-50 h-screen w-[84px] shrink-0 border-r border-slate-200 bg-white flex flex-col items-center py-5 gap-4">
       <div className="h-11 w-11 rounded-2xl bg-gradient-to-br from-blue-600 to-cyan-400 grid place-items-center shadow-sm">
         <span className="text-white font-black text-lg">N</span>
       </div>

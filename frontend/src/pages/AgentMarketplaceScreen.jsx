@@ -106,7 +106,7 @@ export default function AgentMarketplaceScreen({ setScreen }) {
     <div className="min-h-screen bg-[#F6F8FC] flex">
       <ChatbotSubnav setScreen={setScreen} activeMenu="agent-marketplace" />
 
-      <main className="flex-1 min-w-0">
+      <main className="ml-64 flex-1 min-w-0">
         {/* Header */}
         <div className="sticky top-0 z-20 border-b border-slate-200/80 bg-white/90 backdrop-blur-xl shadow-[0_1px_0_rgba(15,23,42,0.03)]">
           <div className="px-8 h-[76px] flex items-center justify-between gap-5">
@@ -158,37 +158,37 @@ export default function AgentMarketplaceScreen({ setScreen }) {
 
           {/* Hero */}
           <section className="relative overflow-hidden rounded-[1.75rem] bg-slate-950 p-7 lg:p-8 shadow-sm ring-1 ring-slate-900/5">
-  <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(37,99,235,0.45),transparent_34%),radial-gradient(circle_at_bottom_left,rgba(16,185,129,0.32),transparent_30%)]" />
-  <div className="absolute right-0 top-0 h-40 w-40 rounded-full bg-blue-500/20 blur-3xl" />
-  <div className="absolute left-0 bottom-0 h-40 w-40 rounded-full bg-emerald-500/20 blur-3xl" />
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(37,99,235,0.45),transparent_34%),radial-gradient(circle_at_bottom_left,rgba(16,185,129,0.32),transparent_30%)]" />
+            <div className="absolute right-0 top-0 h-40 w-40 rounded-full bg-blue-500/20 blur-3xl" />
+            <div className="absolute left-0 bottom-0 h-40 w-40 rounded-full bg-emerald-500/20 blur-3xl" />
 
-  <div className="relative flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
-    <div className="max-w-3xl">
-      <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-4 py-2 text-xs font-bold text-blue-50">
-        🤖 Agent Templates
-      </div>
+            <div className="relative flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+              <div className="max-w-3xl">
+                <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-4 py-2 text-xs font-bold text-blue-50">
+                  🤖 Agent Templates
+                </div>
 
-      <h2 className="mt-5 text-2xl lg:text-3xl font-black tracking-tight text-white">
-        Launch AI agents faster with ready-to-configure templates.
-      </h2>
+                <h2 className="mt-5 text-2xl lg:text-3xl font-black tracking-tight text-white">
+                  Launch AI agents faster with ready-to-configure templates.
+                </h2>
 
-      <p className="mt-3 max-w-3xl text-sm text-blue-100 leading-7">
-        Select a template for Customer Service, Sales, HR, Finance, IT Support,
-        or E-Commerce. Nexora prepares the role, tone, greeting, and recommended
-        features automatically.
-      </p>
-    </div>
+                <p className="mt-3 max-w-3xl text-sm text-blue-100 leading-7">
+                  Select a template for Customer Service, Sales, HR, Finance, IT
+                  Support, or E-Commerce. Nexora prepares the role, tone,
+                  greeting, and recommended features automatically.
+                </p>
+              </div>
 
-    <div className="hidden xl:block rounded-3xl border border-white/10 bg-white/10 p-5 backdrop-blur">
-      <p className="text-xs font-bold uppercase tracking-wide text-blue-100">
-        Setup Speed
-      </p>
-      <p className="mt-2 text-3xl font-black text-white">3 min</p>
-      <p className="mt-1 text-xs text-blue-100">
-        From template to draft bot
-      </p>
-    </div>
-  </div>
+              <div className="hidden xl:block rounded-3xl border border-white/10 bg-white/10 p-5 backdrop-blur">
+                <p className="text-xs font-bold uppercase tracking-wide text-blue-100">
+                  Setup Speed
+                </p>
+                <p className="mt-2 text-3xl font-black text-white">3 min</p>
+                <p className="mt-1 text-xs text-blue-100">
+                  From template to draft bot
+                </p>
+              </div>
+            </div>
           </section>
 
           {/* Category Chips */}
@@ -208,9 +208,9 @@ export default function AgentMarketplaceScreen({ setScreen }) {
                   type="button"
                   onClick={() => selectCategory("all")}
                   className={`h-10 px-4 rounded-full border text-sm font-black transition ${
-                   selectedCategorySlug === "all"
-                    ? "bg-slate-950 border-slate-950 text-white shadow-sm"
-                    : "bg-white border-slate-200 text-slate-700 hover:border-slate-300 hover:bg-slate-50"
+                    selectedCategorySlug === "all"
+                      ? "bg-slate-950 border-slate-950 text-white shadow-sm"
+                      : "bg-white border-slate-200 text-slate-700 hover:border-slate-300 hover:bg-slate-50"
                   }`}
                 >
                   ✨ All Templates
@@ -230,7 +230,9 @@ export default function AgentMarketplaceScreen({ setScreen }) {
                           : "bg-white border-slate-200 text-slate-700 hover:bg-slate-50"
                       }`}
                     >
-                      <span className="mr-2">{getIconEmoji(category.icon)}</span>
+                      <span className="mr-2">
+                        {getIconEmoji(category.icon)}
+                      </span>
                       {category.name}
                     </button>
                   );
@@ -268,8 +270,7 @@ export default function AgentMarketplaceScreen({ setScreen }) {
                 {!loading &&
                   filteredTemplates.map((template) => {
                     const isSelected = selectedTemplateId === template.id;
-                    const categoryColor =
-                      template.category?.color || "#2563eb";
+                    const categoryColor = template.category?.color || "#2563eb";
 
                     return (
                       <button

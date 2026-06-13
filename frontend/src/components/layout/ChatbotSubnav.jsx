@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from "react";
 
 import {
   Bot,
@@ -10,11 +10,11 @@ import {
   PlugZap,
   Send,
   Workflow,
-} from '../../lib/icons';
+} from "../../lib/icons";
 
-import useBotSelection from '../../hooks/useBotSelection';
+import useBotSelection from "../../hooks/useBotSelection";
 
-export default function ChatbotSubnav({ setScreen, activeMenu = 'flows' }) {
+export default function ChatbotSubnav({ setScreen, activeMenu = "flows" }) {
   const {
     loading,
     error,
@@ -31,10 +31,10 @@ export default function ChatbotSubnav({ setScreen, activeMenu = 'flows' }) {
 
   const items = [
     {
-      key: 'all-chatbots',
-      label: 'All Chatbots',
+      key: "all-chatbots",
+      label: "All Chatbots",
       icon: Bot,
-      action: () => setScreen('all-chatbots'),
+      action: () => setScreen("all-chatbots"),
     },
     // {
     //   key: "flows",
@@ -49,16 +49,16 @@ export default function ChatbotSubnav({ setScreen, activeMenu = 'flows' }) {
     //   action: () => setScreen('ai-settings'),
     // },
     {
-      key: 'install',
-      label: 'Install Your Chatbot',
+      key: "install",
+      label: "Install Your Chatbot",
       icon: PlugZap,
-      action: () => setScreen('install'),
+      action: () => setScreen("install"),
     },
     {
-      key: 'channels',
-      label: 'Channels',
+      key: "channels",
+      label: "Channels",
       icon: MessageCircle,
-      action: () => setScreen('channels'),
+      action: () => setScreen("channels"),
     },
     // {
     //   key: "broadcasts",
@@ -68,10 +68,10 @@ export default function ChatbotSubnav({ setScreen, activeMenu = 'flows' }) {
     //   disabled: true,
     // },
     {
-      key: 'ai-settings',
-      label: 'AI Settings',
+      key: "ai-settings",
+      label: "AI Settings",
       icon: BrainCircuit,
-      action: () => setScreen('ai-settings'),
+      action: () => setScreen("ai-settings"),
     },
   ];
 
@@ -82,10 +82,10 @@ export default function ChatbotSubnav({ setScreen, activeMenu = 'flows' }) {
       }
     };
 
-    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
 
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
 
@@ -95,21 +95,21 @@ export default function ChatbotSubnav({ setScreen, activeMenu = 'flows' }) {
     };
 
     window.addEventListener(
-      'nexora:selected-bot-changed',
-      handleSelectedBotChanged,
+      "nexora:selected-bot-changed",
+      handleSelectedBotChanged
     );
 
-    window.addEventListener('nexora:bot-created', handleSelectedBotChanged);
+    window.addEventListener("nexora:bot-created", handleSelectedBotChanged);
 
     return () => {
       window.removeEventListener(
-        'nexora:selected-bot-changed',
-        handleSelectedBotChanged,
+        "nexora:selected-bot-changed",
+        handleSelectedBotChanged
       );
 
       window.removeEventListener(
-        'nexora:bot-created',
-        handleSelectedBotChanged,
+        "nexora:bot-created",
+        handleSelectedBotChanged
       );
     };
   }, [refetch]);
@@ -125,19 +125,19 @@ export default function ChatbotSubnav({ setScreen, activeMenu = 'flows' }) {
     setOpenBotMenu(false);
   };
 
-  const selectedBotName = selectedBot?.name || 'Select Bot';
+  const selectedBotName = selectedBot?.name || "Select Bot";
 
   return (
     <aside
-      className={`relative h-screen shrink-0 border-r border-slate-200 bg-white transition-all duration-300 ease-in-out ${
-        collapsed ? 'w-[76px]' : 'w-64'
+      className={`fixed left-[84px] top-0 z-40 h-screen shrink-0 border-r border-slate-200 bg-white transition-all duration-300 ease-in-out ${
+        collapsed ? "w-[76px]" : "w-64"
       }`}
     >
       <div className="flex h-full flex-col p-4">
         {/* Header */}
         <div
           className={`mb-5 flex items-center ${
-            collapsed ? 'justify-center' : 'justify-between'
+            collapsed ? "justify-center" : "justify-between"
           }`}
         >
           {!collapsed && (
@@ -153,10 +153,10 @@ export default function ChatbotSubnav({ setScreen, activeMenu = 'flows' }) {
             type="button"
             onClick={() => setCollapsed((value) => !value)}
             className="grid h-9 w-9 place-items-center rounded-xl border border-slate-200 bg-white text-slate-500 shadow-sm transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700"
-            title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+            title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
           >
             <span className="text-base font-black">
-              {collapsed ? '›' : '‹'}
+              {collapsed ? "›" : "‹"}
             </span>
           </button>
         </div>
@@ -168,7 +168,7 @@ export default function ChatbotSubnav({ setScreen, activeMenu = 'flows' }) {
               type="button"
               onClick={() => setCollapsed(false)}
               className="grid h-11 w-full place-items-center rounded-2xl border border-slate-200 bg-white text-emerald-600 transition hover:bg-slate-50"
-              title={loading ? 'Loading bots...' : selectedBotName}
+              title={loading ? "Loading bots..." : selectedBotName}
             >
               <MessageCircle size={18} />
             </button>
@@ -185,14 +185,14 @@ export default function ChatbotSubnav({ setScreen, activeMenu = 'flows' }) {
                 />
 
                 <span className="truncate font-semibold text-slate-700">
-                  {loading ? 'Loading bots...' : selectedBotName}
+                  {loading ? "Loading bots..." : selectedBotName}
                 </span>
               </span>
 
               <ChevronDown
                 size={15}
                 className={`text-slate-400 transition ${
-                  openBotMenu ? 'rotate-180' : ''
+                  openBotMenu ? "rotate-180" : ""
                 }`}
               />
             </button>
@@ -230,19 +230,19 @@ export default function ChatbotSubnav({ setScreen, activeMenu = 'flows' }) {
                         onClick={() => handleSelectBot(bot.id)}
                         className={`w-full rounded-xl px-3 py-3 text-left transition ${
                           isSelected
-                            ? 'bg-blue-50 text-blue-700'
-                            : 'text-slate-700 hover:bg-slate-50'
+                            ? "bg-blue-50 text-blue-700"
+                            : "text-slate-700 hover:bg-slate-50"
                         }`}
                       >
                         <div className="flex items-center gap-3">
                           <div
                             className={`grid h-8 w-8 place-items-center rounded-xl text-xs font-black ${
                               isSelected
-                                ? 'bg-blue-600 text-white'
-                                : 'bg-slate-100 text-slate-600'
+                                ? "bg-blue-600 text-white"
+                                : "bg-slate-100 text-slate-600"
                             }`}
                           >
-                            {bot.name?.charAt(0)?.toUpperCase() || 'B'}
+                            {bot.name?.charAt(0)?.toUpperCase() || "B"}
                           </div>
 
                           <div className="min-w-0">
@@ -250,7 +250,7 @@ export default function ChatbotSubnav({ setScreen, activeMenu = 'flows' }) {
                               {bot.name}
                             </p>
                             <p className="mt-0.5 truncate text-[11px] text-slate-400">
-                              {bot.bot_type || 'bot'} · {bot.status || 'active'}
+                              {bot.bot_type || "bot"} · {bot.status || "active"}
                             </p>
                           </div>
                         </div>
@@ -264,7 +264,7 @@ export default function ChatbotSubnav({ setScreen, activeMenu = 'flows' }) {
                   type="button"
                   onClick={() => {
                     setOpenBotMenu(false);
-                    setScreen('agent-marketplace');
+                    setScreen("agent-marketplace");
                   }}
                   className="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-sm font-bold text-blue-700 transition hover:bg-blue-50"
                 >
@@ -293,13 +293,13 @@ export default function ChatbotSubnav({ setScreen, activeMenu = 'flows' }) {
                 }}
                 title={collapsed ? item.label : undefined}
                 className={`group flex w-full items-center rounded-2xl text-sm transition ${
-                  collapsed ? 'justify-center px-0 py-3' : 'gap-3 px-4 py-3'
+                  collapsed ? "justify-center px-0 py-3" : "gap-3 px-4 py-3"
                 } ${
                   isActive
-                    ? 'bg-blue-50 text-blue-700 font-bold'
+                    ? "bg-blue-50 text-blue-700 font-bold"
                     : item.disabled
-                      ? 'cursor-not-allowed text-slate-300'
-                      : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+                    ? "cursor-not-allowed text-slate-300"
+                    : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
                 }`}
               >
                 <Icon size={18} className="shrink-0" />

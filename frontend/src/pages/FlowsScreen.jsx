@@ -191,7 +191,7 @@ export default function FlowsScreen({ setScreen }) {
     <div className="flex min-h-screen bg-[#F6F8FC]">
       <ChatbotSubnav setScreen={setScreen} activeMenu="flows" />
 
-      <main className="flex-1 min-w-0">
+      <main className="ml-64 flex-1 min-w-0">
         <div className="sticky top-0 z-20 border-b border-slate-200/80 bg-white/85 backdrop-blur-xl px-8 h-16 flex items-center justify-between">
           <div>
             <h1 className="font-black text-slate-950">Chat Flows</h1>
@@ -269,7 +269,8 @@ export default function FlowsScreen({ setScreen }) {
               <p className="font-black text-slate-950">Default Flow</p>
 
               <p className="mt-2 text-sm text-slate-500 leading-6">
-                This flow will respond first when customers start a conversation.
+                This flow will respond first when customers start a
+                conversation.
               </p>
 
               <div className="mt-5 rounded-2xl bg-blue-50 border border-blue-100 p-4">

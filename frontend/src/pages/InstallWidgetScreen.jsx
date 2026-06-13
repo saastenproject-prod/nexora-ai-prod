@@ -1,16 +1,16 @@
-import { useEffect, useState } from 'react';
-import ChatbotSubnav from '../components/layout/ChatbotSubnav';
+import { useEffect, useState } from "react";
+import ChatbotSubnav from "../components/layout/ChatbotSubnav";
 
-import { Globe2, MessageCircle } from '../lib/icons';
-import useInstallWidgetData from '../hooks/useInstallWidgetData';
-import useWidgetPreviewConversation from '../hooks/useWidgetPreviewConversation';
-import { supabase } from '../lib/supabaseClient';
+import { Globe2, MessageCircle } from "../lib/icons";
+import useInstallWidgetData from "../hooks/useInstallWidgetData";
+import useWidgetPreviewConversation from "../hooks/useWidgetPreviewConversation";
+import { supabase } from "../lib/supabaseClient";
 
 const DEFAULT_WIDGET_FORM = {
-  title: 'Nexora Support',
-  subtitle: 'Online',
-  greeting_message: 'Hi! Welcome to support. How can we help?',
-  primary_color: '#2563eb',
+  title: "Nexora Support",
+  subtitle: "Online",
+  greeting_message: "Hi! Welcome to support. How can we help?",
+  primary_color: "#2563eb",
 };
 
 export default function InstallWidgetScreen({ setScreen }) {
@@ -32,12 +32,12 @@ export default function InstallWidgetScreen({ setScreen }) {
     resetPreviewConversation,
   } = useWidgetPreviewConversation();
 
-  const [copyStatus, setCopyStatus] = useState('');
-  const [previewMessage, setPreviewMessage] = useState('');
+  const [copyStatus, setCopyStatus] = useState("");
+  const [previewMessage, setPreviewMessage] = useState("");
 
   const [savingWidgetSetting, setSavingWidgetSetting] = useState(false);
-  const [widgetSettingStatus, setWidgetSettingStatus] = useState('');
-  const [widgetSettingError, setWidgetSettingError] = useState('');
+  const [widgetSettingStatus, setWidgetSettingStatus] = useState("");
+  const [widgetSettingError, setWidgetSettingError] = useState("");
 
   const [widgetForm, setWidgetForm] = useState(DEFAULT_WIDGET_FORM);
 
@@ -88,25 +88,25 @@ export default function InstallWidgetScreen({ setScreen }) {
     !loading &&
     !savingWidgetSetting;
 
-  const botFlowStatus = summary?.botFlowReady ? 'ready' : 'needed';
-  const websiteStatus = summary?.websiteReady ? 'active' : 'needed';
-  const whatsappStatus = summary?.whatsappReady ? 'active' : 'needed';
+  const botFlowStatus = summary?.botFlowReady ? "ready" : "needed";
+  const websiteStatus = summary?.websiteReady ? "active" : "needed";
+  const whatsappStatus = summary?.whatsappReady ? "active" : "needed";
 
   const getStatusCardClass = (status) => {
-    if (status === 'ready' || status === 'active') {
-      return 'bg-emerald-50 border-emerald-100 text-emerald-700';
+    if (status === "ready" || status === "active") {
+      return "bg-emerald-50 border-emerald-100 text-emerald-700";
     }
 
-    if (status === 'needed') {
-      return 'bg-amber-50 border-amber-100 text-amber-700';
+    if (status === "needed") {
+      return "bg-amber-50 border-amber-100 text-amber-700";
     }
 
-    return 'bg-slate-50 border-slate-200 text-slate-600';
+    return "bg-slate-50 border-slate-200 text-slate-600";
   };
 
   const updateWidgetForm = (field, value) => {
-    setWidgetSettingError('');
-    setWidgetSettingStatus('');
+    setWidgetSettingError("");
+    setWidgetSettingStatus("");
 
     setWidgetForm((prev) => ({
       ...prev,
@@ -115,70 +115,70 @@ export default function InstallWidgetScreen({ setScreen }) {
   };
 
   const handleResetWidgetForm = () => {
-    setWidgetSettingError('');
-    setWidgetSettingStatus('');
+    setWidgetSettingError("");
+    setWidgetSettingStatus("");
     setWidgetForm(DEFAULT_WIDGET_FORM);
   };
 
   const handleOpenTestPage = () => {
-    window.open('/widget-test.html', '_blank', 'noopener,noreferrer');
+    window.open("/widget-test.html", "_blank", "noopener,noreferrer");
   };
 
   const handleCopyCode = async () => {
-    setCopyStatus('');
+    setCopyStatus("");
 
     try {
       await copyEmbedCode();
-      setCopyStatus('Copied');
+      setCopyStatus("Copied");
 
       setTimeout(() => {
-        setCopyStatus('');
+        setCopyStatus("");
       }, 1800);
     } catch (err) {
       console.error(err);
-      setCopyStatus('Failed');
+      setCopyStatus("Failed");
 
       setTimeout(() => {
-        setCopyStatus('');
+        setCopyStatus("");
       }, 1800);
     }
   };
 
   const handleSaveWidgetSetting = async () => {
-    setWidgetSettingStatus('');
-    setWidgetSettingError('');
+    setWidgetSettingStatus("");
+    setWidgetSettingError("");
 
     if (!widgetSetting?.id && !widgetSetting?.widget_key) {
-      setWidgetSettingError('Widget setting record was not found.');
+      setWidgetSettingError("Widget setting record was not found.");
       return;
     }
 
     if (!widgetForm.title.trim()) {
-      setWidgetSettingError('Widget title is required.');
+      setWidgetSettingError("Widget title is required.");
       return;
     }
 
     if (!widgetForm.subtitle.trim()) {
-      setWidgetSettingError('Widget subtitle is required.');
+      setWidgetSettingError("Widget subtitle is required.");
       return;
     }
 
     if (!widgetForm.greeting_message.trim()) {
-      setWidgetSettingError('Greeting message is required.');
+      setWidgetSettingError("Greeting message is required.");
       return;
     }
 
     if (!isValidHexColor) {
       setWidgetSettingError(
-        'Primary color must use HEX format, for example #2563eb.',
+        "Primary color must use HEX format, for example #2563eb."
       );
       return;
     }
 
     if (!hasWidgetFormChanges) {
-      setWidgetSettingStatus('No changes to save.');
+      setWidgetSettingStatus("No changes to save.");
       setTimeout(() => {
-        setWidgetSettingStatus('');
+        setWidgetSettingStatus("");
       }, 1800);
       return;
     }
@@ -194,12 +194,12 @@ export default function InstallWidgetScreen({ setScreen }) {
         updated_at: new Date().toISOString(),
       };
 
-      let query = supabase.from('widget_settings').update(payload);
+      let query = supabase.from("widget_settings").update(payload);
 
       if (widgetSetting?.id) {
-        query = query.eq('id', widgetSetting.id);
+        query = query.eq("id", widgetSetting.id);
       } else {
-        query = query.eq('widget_key', widgetSetting.widget_key);
+        query = query.eq("widget_key", widgetSetting.widget_key);
       }
 
       const { error: updateError } = await query;
@@ -207,17 +207,17 @@ export default function InstallWidgetScreen({ setScreen }) {
       if (updateError) throw updateError;
 
       setWidgetSettingStatus(
-        'Widget settings saved. Refresh your embedded page to see the latest configuration.',
+        "Widget settings saved. Refresh your embedded page to see the latest configuration."
       );
 
       await refetch();
 
       setTimeout(() => {
-        setWidgetSettingStatus('');
+        setWidgetSettingStatus("");
       }, 3000);
     } catch (err) {
       console.error(err);
-      setWidgetSettingError(err?.message || 'Failed to save widget settings.');
+      setWidgetSettingError(err?.message || "Failed to save widget settings.");
     } finally {
       setSavingWidgetSetting(false);
     }
@@ -227,12 +227,12 @@ export default function InstallWidgetScreen({ setScreen }) {
     try {
       await createPreviewConversation({
         message: previewMessage,
-        customerName: 'Website Visitor',
-        customerEmail: 'visitor@example.com',
+        customerName: "Website Visitor",
+        customerEmail: "visitor@example.com",
         greetingMessage: widgetGreeting,
       });
 
-      setPreviewMessage('');
+      setPreviewMessage("");
     } catch (err) {
       console.error(err);
     }
@@ -241,7 +241,7 @@ export default function InstallWidgetScreen({ setScreen }) {
   const handleResetPreviewConversation = async () => {
     try {
       await resetPreviewConversation();
-      setPreviewMessage('');
+      setPreviewMessage("");
     } catch (err) {
       console.error(err);
     }
@@ -251,7 +251,7 @@ export default function InstallWidgetScreen({ setScreen }) {
     <div className="min-h-screen bg-[#F6F8FC] flex">
       <ChatbotSubnav setScreen={setScreen} activeMenu="install" />
 
-      <main className="flex-1 min-w-0">
+      <main className="ml-64 flex-1 min-w-0">
         <div className="sticky top-0 z-20 border-b border-slate-200/80 bg-white/85 backdrop-blur-xl px-8 h-16 flex items-center justify-between">
           <div>
             <h1 className="font-black text-slate-950">Install Your Chatbot</h1>
@@ -272,7 +272,7 @@ export default function InstallWidgetScreen({ setScreen }) {
 
             <button
               type="button"
-              onClick={() => setScreen('builder')}
+              onClick={() => setScreen("builder")}
               className="h-10 px-4 rounded-2xl bg-blue-600 text-white text-sm font-bold hover:bg-blue-700 transition"
             >
               Open Builder
@@ -325,8 +325,8 @@ export default function InstallWidgetScreen({ setScreen }) {
                 </p>
 
                 <div className="mt-6 inline-flex rounded-2xl border border-white/15 bg-white/10 px-4 py-3 text-sm text-blue-50">
-                  Bot:{' '}
-                  {loading ? 'Loading...' : activeBot?.name || 'No active bot'}
+                  Bot:{" "}
+                  {loading ? "Loading..." : activeBot?.name || "No active bot"}
                 </div>
               </div>
             </div>
@@ -337,40 +337,40 @@ export default function InstallWidgetScreen({ setScreen }) {
               <div className="mt-5 space-y-3">
                 <div
                   className={`flex items-center justify-between rounded-2xl border p-4 ${getStatusCardClass(
-                    botFlowStatus,
+                    botFlowStatus
                   )}`}
                 >
                   <span className="text-sm font-bold text-slate-700">
                     Bot Flow
                   </span>
                   <span className="text-sm font-black capitalize">
-                    {summary?.botFlowReady ? 'Ready' : 'Setup Needed'}
+                    {summary?.botFlowReady ? "Ready" : "Setup Needed"}
                   </span>
                 </div>
 
                 <div
                   className={`flex items-center justify-between rounded-2xl border p-4 ${getStatusCardClass(
-                    websiteStatus,
+                    websiteStatus
                   )}`}
                 >
                   <span className="text-sm font-bold text-slate-700">
                     Website Widget
                   </span>
                   <span className="text-sm font-black capitalize">
-                    {summary?.websiteReady ? 'Active' : 'Setup Needed'}
+                    {summary?.websiteReady ? "Active" : "Setup Needed"}
                   </span>
                 </div>
 
                 <div
                   className={`flex items-center justify-between rounded-2xl border p-4 ${getStatusCardClass(
-                    whatsappStatus,
+                    whatsappStatus
                   )}`}
                 >
                   <span className="text-sm font-bold text-slate-700">
                     WhatsApp
                   </span>
                   <span className="text-sm font-black capitalize">
-                    {summary?.whatsappReady ? 'Active' : 'Setup Needed'}
+                    {summary?.whatsappReady ? "Active" : "Setup Needed"}
                   </span>
                 </div>
               </div>
@@ -381,8 +381,8 @@ export default function InstallWidgetScreen({ setScreen }) {
                 </p>
                 <p className="mt-2 break-all text-sm font-bold text-slate-950">
                   {loading
-                    ? 'Loading...'
-                    : widgetSetting?.widget_key || 'No widget key found'}
+                    ? "Loading..."
+                    : widgetSetting?.widget_key || "No widget key found"}
                 </p>
               </div>
             </div>
@@ -431,10 +431,10 @@ export default function InstallWidgetScreen({ setScreen }) {
                     }}
                   >
                     {savingWidgetSetting
-                      ? 'Saving...'
+                      ? "Saving..."
                       : hasWidgetFormChanges
-                        ? 'Save Settings'
-                        : 'Saved'}
+                      ? "Save Settings"
+                      : "Saved"}
                   </button>
                 </div>
               </div>
@@ -447,7 +447,7 @@ export default function InstallWidgetScreen({ setScreen }) {
                   <input
                     value={widgetForm.title}
                     onChange={(event) =>
-                      updateWidgetForm('title', event.target.value)
+                      updateWidgetForm("title", event.target.value)
                     }
                     placeholder="Customer Support Bot"
                     className="mt-2 h-11 w-full rounded-2xl border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-800 outline-none focus:ring-4 focus:ring-blue-100 focus:border-blue-400"
@@ -461,7 +461,7 @@ export default function InstallWidgetScreen({ setScreen }) {
                   <input
                     value={widgetForm.subtitle}
                     onChange={(event) =>
-                      updateWidgetForm('subtitle', event.target.value)
+                      updateWidgetForm("subtitle", event.target.value)
                     }
                     placeholder="Online"
                     className="mt-2 h-11 w-full rounded-2xl border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-800 outline-none focus:ring-4 focus:ring-blue-100 focus:border-blue-400"
@@ -475,7 +475,7 @@ export default function InstallWidgetScreen({ setScreen }) {
                   <textarea
                     value={widgetForm.greeting_message}
                     onChange={(event) =>
-                      updateWidgetForm('greeting_message', event.target.value)
+                      updateWidgetForm("greeting_message", event.target.value)
                     }
                     placeholder="Halo! Ada yang bisa kami bantu hari ini?"
                     className="mt-2 h-24 w-full resize-none rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-800 outline-none focus:ring-4 focus:ring-blue-100 focus:border-blue-400"
@@ -496,7 +496,7 @@ export default function InstallWidgetScreen({ setScreen }) {
                           : DEFAULT_WIDGET_FORM.primary_color
                       }
                       onChange={(event) =>
-                        updateWidgetForm('primary_color', event.target.value)
+                        updateWidgetForm("primary_color", event.target.value)
                       }
                       className="h-11 w-14 rounded-xl border border-slate-200 bg-white p-1 cursor-pointer"
                     />
@@ -504,13 +504,13 @@ export default function InstallWidgetScreen({ setScreen }) {
                     <input
                       value={widgetForm.primary_color}
                       onChange={(event) =>
-                        updateWidgetForm('primary_color', event.target.value)
+                        updateWidgetForm("primary_color", event.target.value)
                       }
                       placeholder="#2563eb"
                       className={`h-11 flex-1 rounded-2xl border bg-white px-4 text-sm font-semibold outline-none focus:ring-4 ${
                         isValidHexColor
-                          ? 'border-slate-200 text-slate-800 focus:ring-blue-100 focus:border-blue-400'
-                          : 'border-red-300 text-red-700 focus:ring-red-100 focus:border-red-400'
+                          ? "border-slate-200 text-slate-800 focus:ring-blue-100 focus:border-blue-400"
+                          : "border-red-300 text-red-700 focus:ring-red-100 focus:border-red-400"
                       }`}
                     />
                   </div>
@@ -537,7 +537,7 @@ export default function InstallWidgetScreen({ setScreen }) {
                     />
                     <div>
                       <p className="text-sm font-black text-slate-950">
-                        {widgetForm.primary_color || '-'}
+                        {widgetForm.primary_color || "-"}
                       </p>
                       <p className="text-xs text-slate-500">
                         Used by header, bubble, send button, and customer
@@ -548,7 +548,7 @@ export default function InstallWidgetScreen({ setScreen }) {
                 </div>
 
                 <div className="md:col-span-2 rounded-2xl border border-blue-100 bg-blue-50 px-4 py-3 text-sm leading-6 text-blue-800">
-                  Changes are saved to{' '}
+                  Changes are saved to{" "}
                   <span className="font-black">widget_settings</span>. After
                   saving, refresh the embedded website or test page to see the
                   latest widget configuration.
@@ -642,8 +642,8 @@ export default function InstallWidgetScreen({ setScreen }) {
                         }}
                       >
                         {sendingPreviewMessage
-                          ? 'Sending...'
-                          : 'Send Preview Message'}
+                          ? "Sending..."
+                          : "Send Preview Message"}
                       </button>
 
                       <button
@@ -679,15 +679,15 @@ export default function InstallWidgetScreen({ setScreen }) {
                   disabled={!embedCode || loading}
                   className="h-10 px-4 rounded-2xl bg-slate-950 text-white text-sm font-bold disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-800 transition"
                 >
-                  {copyStatus || 'Copy Code'}
+                  {copyStatus || "Copy Code"}
                 </button>
               </div>
 
               <pre className="mt-5 overflow-x-auto rounded-3xl bg-slate-950 p-5 text-sm text-blue-100">
                 <code>
                   {loading
-                    ? 'Loading embed code...'
-                    : embedCode || 'Embed code is not available.'}
+                    ? "Loading embed code..."
+                    : embedCode || "Embed code is not available."}
                 </code>
               </pre>
 

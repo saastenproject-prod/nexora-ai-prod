@@ -1,23 +1,12 @@
 import ChatbotSubnav from "../components/layout/ChatbotSubnav";
 
-import {
-  Bot,
-  MessageCircle,
-  Plus,
-  Workflow,
-} from "../lib/icons";
+import { Bot, MessageCircle, Plus, Workflow } from "../lib/icons";
 
 import useAllChatbotsData from "../hooks/useAllChatbotsData";
 
 export default function AllChatbotsScreen({ setScreen }) {
-  const {
-    loading,
-    error,
-    workspace,
-    chatbots,
-    selectBot,
-    refetch,
-  } = useAllChatbotsData();
+  const { loading, error, workspace, chatbots, selectBot, refetch } =
+    useAllChatbotsData();
 
   const formatStatus = (status) => {
     if (!status) return "Unknown";
@@ -50,7 +39,7 @@ export default function AllChatbotsScreen({ setScreen }) {
     <div className="flex min-h-screen bg-[#F6F8FC]">
       <ChatbotSubnav setScreen={setScreen} activeMenu="all-chatbots" />
 
-      <main className="flex-1 min-w-0">
+      <main className="ml-64 flex-1 min-w-0">
         <div className="sticky top-0 z-20 border-b border-slate-200/80 bg-white/85 backdrop-blur-xl px-8 h-16 flex items-center justify-between">
           <div>
             <h1 className="font-black text-slate-950">All Chatbots</h1>

@@ -181,9 +181,9 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 flex font-sans text-slate-900">
+    <div className="min-h-screen bg-slate-50 font-sans text-slate-900">
       <Sidebar active={active} setActive={handleActive} />
-      <div className="flex-1 min-w-0">{current}</div>
+      <main className="ml-20 min-h-screen">{current}</main>
     </div>
   );
 }
