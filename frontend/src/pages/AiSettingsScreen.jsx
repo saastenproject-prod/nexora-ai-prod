@@ -1,5 +1,5 @@
-import ChatbotSubnav from "../components/layout/ChatbotSubnav";
-import { useRef, useState } from "react";
+import ChatbotSubnav from '../components/layout/ChatbotSubnav';
+import { useRef, useState } from 'react';
 import {
   BookOpen,
   BrainCircuit,
@@ -10,53 +10,53 @@ import {
   Puzzle,
   BarChart3,
   User,
-} from "../lib/icons";
-import useAiSettingsData from "../hooks/useAiSettingsData";
+} from '../lib/icons';
+import useAiSettingsData from '../hooks/useAiSettingsData';
 
 const DEFAULT_ARTICLE_FORM = {
-  title: "",
-  category: "",
-  tags: "",
-  content: "",
-  status: "draft",
+  title: '',
+  category: '',
+  tags: '',
+  content: '',
+  status: 'draft',
 };
 
 const DEFAULT_FEATURE_FORM = {
-  template_feature_id: "",
-  feature_name: "",
-  feature_key: "",
-  feature_type: "",
-  description: "",
-  required_data: "",
+  template_feature_id: '',
+  feature_name: '',
+  feature_key: '',
+  feature_type: '',
+  description: '',
+  required_data: '',
   is_enabled: true,
-  configuration_json: "{}",
+  configuration_json: '{}',
 };
 
 const DEFAULT_EMPLOYEE_FROM = {
-  employee_id: "",
-  full_name: "",
-  email: "",
-  phone_number: "",
-  department: "",
-  job_title: "",
-  job_description: "",
-  access_level: "employee",
-  employee_status: "active",
+  employee_id: '',
+  full_name: '',
+  email: '',
+  phone_number: '',
+  department: '',
+  job_title: '',
+  job_description: '',
+  access_level: 'employee',
+  employee_status: 'active',
   annual_leave_entitlement: 12,
   annual_leave_used: 0,
 };
 
 const arrayToText = (value) => {
-  if (Array.isArray(value)) return value.join(", ");
-  if (typeof value === "string") return value;
-  return "";
+  if (Array.isArray(value)) return value.join(', ');
+  if (typeof value === 'string') return value;
+  return '';
 };
 
 const getDocumentExtension = (document) => {
   return (
     document?.metadata?.extension ||
-    document?.file_name?.split(".").pop()?.toLowerCase() ||
-    ""
+    document?.file_name?.split('.').pop()?.toLowerCase() ||
+    ''
   );
 };
 
@@ -64,11 +64,11 @@ const canIndexDocument = (document) => {
   const extension = getDocumentExtension(document);
 
   return (
-    extension === "txt" ||
-    extension === "pdf" ||
-    extension === "docx" ||
-    (extension === "csv" &&
-      ["uploaded", "indexed", "failed"].includes(document.status))
+    extension === 'txt' ||
+    extension === 'pdf' ||
+    extension === 'docx' ||
+    (extension === 'csv' &&
+      ['uploaded', 'indexed', 'failed'].includes(document.status))
   );
 };
 
@@ -76,10 +76,10 @@ const isComingSoonDocument = (document) => {
   const extension = getDocumentExtension(document);
 
   return (
-    (extension && extension !== "txt") ||
-    extension === "pdf" ||
-    extension === "docx" ||
-    extension === "csv"
+    (extension && extension !== 'txt') ||
+    extension === 'pdf' ||
+    extension === 'docx' ||
+    extension === 'csv'
   );
 };
 
@@ -93,12 +93,12 @@ const ToggleSwitch = ({ checked, onChange, label }) => {
       <span className="text-sm font-bold text-slate-700">{label}</span>
       <div
         className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
-          checked ? "bg-blue-600" : "bg-slate-200"
+          checked ? 'bg-blue-600' : 'bg-slate-200'
         }`}
       >
         <span
           className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-md ring-0 transition duration-200 ease-in-out ${
-            checked ? "translate-x-5" : "translate-x-0"
+            checked ? 'translate-x-5' : 'translate-x-0'
           }`}
         />
       </div>
@@ -156,11 +156,11 @@ export default function AiSettingsScreen({ setScreen }) {
 
   const fileInputRef = useRef(null);
 
-  const [activeTab, setActiveTab] = useState("identify");
+  const [activeTab, setActiveTab] = useState('identify');
   const [uploading, setUploading] = useState(false);
   const [indexingDocumentId, setIndexingDocumentId] = useState(null);
-  const [saveStatus, setSaveStatus] = useState("");
-  const [articleError, setArticleError] = useState("");
+  const [saveStatus, setSaveStatus] = useState('');
+  const [articleError, setArticleError] = useState('');
   const [articleForm, setArticleForm] = useState(DEFAULT_ARTICLE_FORM);
   const [showCreateFeatureModal, setShowCreateFeatureModal] = useState(false);
   const [featureForm, setFeatureForm] = useState(DEFAULT_FEATURE_FORM);
@@ -168,37 +168,37 @@ export default function AiSettingsScreen({ setScreen }) {
   const [editingFeature, setEditingFeature] = useState(null);
   const [deletingFeatureId, setDeletingFeatureId] = useState(null);
   const [togglingFeatureId, setTogglingFeatureId] = useState(null);
-  const [loadingMessage, setLoadingMessage] = useState("");
+  const [loadingMessage, setLoadingMessage] = useState('');
 
   const [isEmployeeModalOpen, setIsEmployeeModalOpen] = useState(false);
   const [employeeForm, setEmployeeForm] = useState(DEFAULT_EMPLOYEE_FROM);
   const [selectedEmployee, setSelectedEmployee] = useState(null);
-  const [employeeSearch, setEmployeeSearch] = useState("");
+  const [employeeSearch, setEmployeeSearch] = useState('');
 
-  const [vacancySearch, setVacancySearch] = useState("");
+  const [vacancySearch, setVacancySearch] = useState('');
   const [isVacancyModalOpen, setIsVacancyModalOpen] = useState(false);
   const [selectedVacancy, setSelectedVacancy] = useState(null);
   const [deletingVacancyId, setDeletingVacancyId] = useState(null);
   const [vacancyForm, setVacancyForm] = useState({
-    vacancy_code: "",
-    job_title: "",
-    department: "",
-    employment_type: "",
-    work_location: "",
-    work_mode: "",
-    job_description: "",
-    responsibilities: "",
-    qualifications: "",
-    salary_min: "",
-    salary_max: "",
-    salary_currency: "IDR",
+    vacancy_code: '',
+    job_title: '',
+    department: '',
+    employment_type: '',
+    work_location: '',
+    work_mode: '',
+    job_description: '',
+    responsibilities: '',
+    qualifications: '',
+    salary_min: '',
+    salary_max: '',
+    salary_currency: 'IDR',
     show_salary: true,
-    application_url: "",
-    contact_email: "",
-    vacancy_status: "draft",
-    visibility: "public",
-    published_at: "",
-    closing_date: "",
+    application_url: '',
+    contact_email: '',
+    vacancy_status: 'draft',
+    visibility: 'public',
+    published_at: '',
+    closing_date: '',
   });
 
   const handleOpenFilePicker = () => {
@@ -214,7 +214,7 @@ export default function AiSettingsScreen({ setScreen }) {
 
     try {
       await uploadKnowledgeDocument(file);
-      event.target.value = "";
+      event.target.value = '';
     } catch (err) {
       // Error sudah ditampilkan dari hook.
     } finally {
@@ -236,7 +236,7 @@ export default function AiSettingsScreen({ setScreen }) {
 
   const handleDeleteDocument = async (document) => {
     const confirmed = window.confirm(
-      `Delete document "${document.file_name}"? This will also delete its indexed chunks.`
+      `Delete document "${document.file_name}"? This will also delete its indexed chunks.`,
     );
 
     if (!confirmed) return;
@@ -249,7 +249,7 @@ export default function AiSettingsScreen({ setScreen }) {
   };
 
   const updateArticleForm = (field, value) => {
-    setArticleError("");
+    setArticleError('');
 
     setArticleForm((current) => ({
       ...current,
@@ -258,20 +258,20 @@ export default function AiSettingsScreen({ setScreen }) {
   };
 
   const handleSaveSettings = async () => {
-    setSaveStatus("");
+    setSaveStatus('');
 
     try {
       await saveSettings();
-      setSaveStatus("Saved");
+      setSaveStatus('Saved');
 
       setTimeout(() => {
-        setSaveStatus("");
+        setSaveStatus('');
       }, 1800);
     } catch (err) {
-      setSaveStatus("Save failed");
+      setSaveStatus('Save failed');
 
       setTimeout(() => {
-        setSaveStatus("");
+        setSaveStatus('');
       }, 1800);
     }
   };
@@ -279,15 +279,15 @@ export default function AiSettingsScreen({ setScreen }) {
   const handleCreateArticle = async (event) => {
     event.preventDefault();
 
-    setArticleError("");
+    setArticleError('');
 
     if (!articleForm.title.trim()) {
-      setArticleError("Article title wajib diisi.");
+      setArticleError('Article title wajib diisi.');
       return;
     }
 
     if (!articleForm.content.trim()) {
-      setArticleError("Article content wajib diisi.");
+      setArticleError('Article content wajib diisi.');
       return;
     }
 
@@ -295,7 +295,7 @@ export default function AiSettingsScreen({ setScreen }) {
       await createArticle(articleForm);
       setArticleForm(DEFAULT_ARTICLE_FORM);
     } catch (err) {
-      setArticleError(err?.message || "Failed to create article.");
+      setArticleError(err?.message || 'Failed to create article.');
     }
   };
 
@@ -309,38 +309,38 @@ export default function AiSettingsScreen({ setScreen }) {
 
   // EMPLOYEE STUFF
   const handleOpenCreateEmployee = async () => {
-    setLoadingMessage("Wait a moment...");
+    setLoadingMessage('Wait a moment...');
     const employeeId = await generateEmployeeId();
 
     setSelectedEmployee(null);
 
     setEmployeeForm({
       employee_id: employeeId,
-      full_name: "",
-      email: "",
-      phone_number: "",
-      department: "",
-      job_title: "",
-      job_description: "",
-      access_level: "employee",
-      employee_status: "active",
+      full_name: '',
+      email: '',
+      phone_number: '',
+      department: '',
+      job_title: '',
+      job_description: '',
+      access_level: 'employee',
+      employee_status: 'active',
       annual_leave_entitlement: 12,
       annual_leave_used: 0,
     });
 
     setIsEmployeeModalOpen(true);
-    setLoadingMessage("");
+    setLoadingMessage('');
   };
 
   const handleEmployeeStatusToggle = async (employee) => {
     try {
-      setLoadingMessage("Updating employee...");
+      setLoadingMessage('Updating employee...');
 
       await handleToggleEmployeeStatus(employee);
     } catch (error) {
       console.error(error);
     } finally {
-      setLoadingMessage("");
+      setLoadingMessage('');
     }
   };
 
@@ -368,10 +368,10 @@ export default function AiSettingsScreen({ setScreen }) {
     let success = false;
 
     if (selectedEmployee) {
-      setLoadingMessage("Updating employee...");
+      setLoadingMessage('Updating employee...');
       success = await updateEmployee(selectedEmployee.id, employeeForm);
     } else {
-      setLoadingMessage("Creating employee...");
+      setLoadingMessage('Creating employee...');
       success = await createEmployee(employeeForm);
     }
 
@@ -379,27 +379,27 @@ export default function AiSettingsScreen({ setScreen }) {
 
     setIsEmployeeModalOpen(false);
     setSelectedEmployee(null);
-    setLoadingMessage("");
+    setLoadingMessage('');
   };
 
   const handleDeleteEmployee = async (employee) => {
     const confirmed = window.confirm(
-      `Delete employee "${employee.full_name}"?`
+      `Delete employee "${employee.full_name}"?`,
     );
 
     if (!confirmed) {
       return;
     }
 
-    setLoadingMessage("Deleting employee...");
+    setLoadingMessage('Deleting employee...');
 
     const success = await deleteEmployee(employee.id);
 
     if (!success) {
-      alert("Failed to delete employee");
+      alert('Failed to delete employee');
     }
 
-    setLoadingMessage("");
+    setLoadingMessage('');
   };
 
   const filteredEmployees = employees.filter((employee) => {
@@ -416,62 +416,62 @@ export default function AiSettingsScreen({ setScreen }) {
 
   // VACANCIES STUFF
   const handleOpenCreateVacancy = async () => {
-    setLoadingMessage("Wait a moment...");
+    setLoadingMessage('Wait a moment...');
     const vacancyCode = await generateVacancyCode();
 
     setSelectedVacancy(null);
 
     setVacancyForm({
       vacancy_code: vacancyCode,
-      job_title: "",
-      department: "",
-      employment_type: "",
-      work_location: "",
-      work_mode: "",
-      job_description: "",
-      responsibilities: "",
-      qualifications: "",
-      salary_min: "",
-      salary_max: "",
-      salary_currency: "IDR",
+      job_title: '',
+      department: '',
+      employment_type: '',
+      work_location: '',
+      work_mode: '',
+      job_description: '',
+      responsibilities: '',
+      qualifications: '',
+      salary_min: '',
+      salary_max: '',
+      salary_currency: 'IDR',
       show_salary: true,
-      application_url: "",
-      contact_email: "",
-      vacancy_status: "draft",
-      visibility: "public",
-      published_at: "",
-      closing_date: "",
+      application_url: '',
+      contact_email: '',
+      vacancy_status: 'draft',
+      visibility: 'public',
+      published_at: '',
+      closing_date: '',
     });
 
     setIsVacancyModalOpen(true);
-    setLoadingMessage("");
+    setLoadingMessage('');
   };
 
   const handleOpenEditVacancy = (vacancy) => {
     setSelectedVacancy(vacancy);
 
     setVacancyForm({
-      vacancy_code: vacancy.vacancy_code ?? "",
-      job_title: vacancy.job_title ?? "",
-      department: vacancy.department ?? "",
-      employment_type: vacancy.employment_type ?? "",
-      work_location: vacancy.work_location ?? "",
-      work_mode: vacancy.work_mode ?? "",
-      job_description: vacancy.job_description ?? "",
-      responsibilities: vacancy.responsibilities ?? "",
-      qualifications: vacancy.qualifications ?? "",
-      salary_min: vacancy.salary_min ?? "",
-      salary_max: vacancy.salary_max ?? "",
-      salary_currency: vacancy.salary_currency ?? "IDR",
+      vacancy_code: vacancy.vacancy_code ?? '',
+      job_title: vacancy.job_title ?? '',
+      department: vacancy.department ?? '',
+      employment_type: vacancy.employment_type ?? '',
+      work_location: vacancy.work_location ?? '',
+      work_mode: vacancy.work_mode ?? '',
+      job_description: vacancy.job_description ?? '',
+      responsibilities: vacancy.responsibilities ?? '',
+      qualifications: vacancy.qualifications ?? '',
+      salary_min: vacancy.salary_min ?? '',
+      salary_max: vacancy.salary_max ?? '',
+      salary_currency: vacancy.salary_currency ?? 'IDR',
       show_salary: vacancy.show_salary ?? true,
-      application_url: vacancy.application_url ?? "",
-      contact_email: vacancy.contact_email ?? "",
-      vacancy_status: vacancy.vacancy_status ?? "draft",
-      visibility: vacancy.visibility ?? "public",
+      application_url: vacancy.application_url ?? '',
+      contact_email: vacancy.contact_email ?? '',
+      vacancy_status: vacancy.vacancy_status ?? 'draft',
+      visibility: vacancy.visibility ?? 'public',
       published_at: vacancy.published_at
         ? vacancy.published_at.slice(0, 10)
-        : "",
-      closing_date: vacancy.closing_date ?? "",
+        : '',
+      closing_date: vacancy.closing_date ?? '',
     });
 
     setIsVacancyModalOpen(true);
@@ -490,15 +490,15 @@ export default function AiSettingsScreen({ setScreen }) {
       };
 
       if (selectedVacancy) {
-        setLoadingMessage("Updating vacancy...");
+        setLoadingMessage('Updating vacancy...');
         await updateVacancy(selectedVacancy.id, payload);
       } else {
-        setLoadingMessage("Creating vacancy...");
+        setLoadingMessage('Creating vacancy...');
         await createVacancy(payload);
       }
 
       setIsVacancyModalOpen(false);
-      setLoadingMessage("");
+      setLoadingMessage('');
     } catch (error) {
       console.error(error);
     }
@@ -513,9 +513,9 @@ export default function AiSettingsScreen({ setScreen }) {
       vacancy.work_location,
       vacancy.vacancy_status,
     ]
-      .join(" ")
+      .join(' ')
       .toLowerCase()
-      .includes(vacancySearch.toLowerCase())
+      .includes(vacancySearch.toLowerCase()),
   );
 
   const handleDeleteVacancy = async (vacancy) => {
@@ -526,7 +526,7 @@ export default function AiSettingsScreen({ setScreen }) {
     }
 
     try {
-      setLoadingMessage("Deleting vacancy...");
+      setLoadingMessage('Deleting vacancy...');
       setDeletingVacancyId(vacancy.id);
 
       await deleteVacancy(vacancy);
@@ -534,7 +534,7 @@ export default function AiSettingsScreen({ setScreen }) {
       console.error(error);
     } finally {
       setDeletingVacancyId(null);
-      setLoadingMessage("");
+      setLoadingMessage('');
     }
   };
 
@@ -558,23 +558,23 @@ export default function AiSettingsScreen({ setScreen }) {
     if (!template) {
       setFeatureForm((prev) => ({
         ...prev,
-        template_feature_id: "",
+        template_feature_id: '',
       }));
       return;
     }
 
     setFeatureForm({
       template_feature_id: template.id,
-      feature_name: template.feature_name || "",
-      feature_key: template.feature_key || "",
-      feature_type: template.feature_type || "",
-      description: template.description || "",
-      required_data: template.required_data || "",
+      feature_name: template.feature_name || '',
+      feature_key: template.feature_key || '',
+      feature_type: template.feature_type || '',
+      description: template.description || '',
+      required_data: template.required_data || '',
       is_enabled: template.is_enabled ?? true,
       configuration_json: JSON.stringify(
         template.configuration_json || {},
         null,
-        2
+        2,
       ),
     });
   };
@@ -583,17 +583,17 @@ export default function AiSettingsScreen({ setScreen }) {
     e.preventDefault();
 
     if (!featureForm.template_feature_id) {
-      alert("Template Feature is required.");
+      alert('Template Feature is required.');
       return;
     }
 
     if (!featureForm.feature_name?.trim()) {
-      alert("Feature Name is required.");
+      alert('Feature Name is required.');
       return;
     }
 
     if (!featureForm.description?.trim()) {
-      alert("Description is required.");
+      alert('Description is required.');
       return;
     }
     try {
@@ -619,13 +619,13 @@ export default function AiSettingsScreen({ setScreen }) {
     setEditingFeature(feature);
 
     setFeatureForm({
-      template_feature_id: feature.template_feature_id || "",
-      feature_name: feature.feature_name || "",
-      description: feature.description || "",
+      template_feature_id: feature.template_feature_id || '',
+      feature_name: feature.feature_name || '',
+      description: feature.description || '',
       configuration_json: JSON.stringify(
         feature.configuration_json || {},
         null,
-        2
+        2,
       ),
       is_enabled: feature.is_enabled ?? true,
     });
@@ -635,7 +635,7 @@ export default function AiSettingsScreen({ setScreen }) {
 
   const handleToggleFeature = async (feature) => {
     if (togglingFeatureId === feature.id) return;
-    setLoadingMessage("Updating feature...");
+    setLoadingMessage('Updating feature...');
 
     try {
       setTogglingFeatureId(feature.id);
@@ -645,13 +645,13 @@ export default function AiSettingsScreen({ setScreen }) {
       console.error(err);
     } finally {
       setTogglingFeatureId(null);
-      setLoadingMessage("");
+      setLoadingMessage('');
     }
   };
 
   const handleDeleteFeature = async (feature) => {
     const confirmed = window.confirm(
-      `Delete feature "${feature.feature_name}"?`
+      `Delete feature "${feature.feature_name}"?`,
     );
 
     if (!confirmed) return;
@@ -660,94 +660,94 @@ export default function AiSettingsScreen({ setScreen }) {
 
     try {
       setDeletingFeatureId(feature.id);
-      setLoadingMessage("Deleting feature...");
+      setLoadingMessage('Deleting feature...');
 
       await deleteFeature(feature.id);
     } finally {
       setDeletingFeatureId(null);
-      setLoadingMessage("");
+      setLoadingMessage('');
     }
   };
 
   const formatStatus = (status) => {
-    if (!status) return "Unknown";
+    if (!status) return 'Unknown';
 
     return status
-      .split("_")
+      .split('_')
       .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-      .join(" ");
+      .join(' ');
   };
 
   const formatSourceType = (sourceType) => {
-    if (!sourceType) return "-";
+    if (!sourceType) return '-';
 
     return sourceType
-      .split("_")
+      .split('_')
       .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-      .join(" ");
+      .join(' ');
   };
 
   const formatUpdatedAt = (value) => {
-    if (!value) return "-";
+    if (!value) return '-';
 
     const date = new Date(value);
     const now = new Date();
     const diffMs = now.getTime() - date.getTime();
     const diffMinutes = Math.floor(diffMs / 60000);
 
-    if (diffMinutes < 1) return "Just now";
+    if (diffMinutes < 1) return 'Just now';
     if (diffMinutes < 60) return `${diffMinutes}m ago`;
 
     const diffHours = Math.floor(diffMinutes / 60);
     if (diffHours < 24) return `${diffHours}h ago`;
 
     const diffDays = Math.floor(diffHours / 24);
-    if (diffDays === 1) return "Yesterday";
+    if (diffDays === 1) return 'Yesterday';
     if (diffDays < 7) return `${diffDays}d ago`;
 
-    return date.toLocaleDateString("en-GB", {
-      day: "2-digit",
-      month: "short",
-      year: "numeric",
+    return date.toLocaleDateString('en-GB', {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric',
     });
   };
 
   const getStatusClass = (status) => {
-    if (status === "indexed") return "bg-emerald-50 text-emerald-700";
-    if (status === "published") return "bg-emerald-50 text-emerald-700";
-    if (status === "processing") return "bg-amber-50 text-amber-700";
-    if (status === "uploaded") return "bg-blue-50 text-blue-700";
-    if (status === "draft") return "bg-slate-100 text-slate-600";
-    if (status === "failed") return "bg-red-50 text-red-700";
-    if (status === "archived") return "bg-slate-100 text-slate-600";
+    if (status === 'indexed') return 'bg-emerald-50 text-emerald-700';
+    if (status === 'published') return 'bg-emerald-50 text-emerald-700';
+    if (status === 'processing') return 'bg-amber-50 text-amber-700';
+    if (status === 'uploaded') return 'bg-blue-50 text-blue-700';
+    if (status === 'draft') return 'bg-slate-100 text-slate-600';
+    if (status === 'failed') return 'bg-red-50 text-red-700';
+    if (status === 'archived') return 'bg-slate-100 text-slate-600';
 
-    return "bg-slate-100 text-slate-600";
+    return 'bg-slate-100 text-slate-600';
   };
 
   const getHealthDescription = () => {
     if (stats.totalDocuments === 0 && stats.totalArticles === 0) {
-      return "No knowledge source has been added yet.";
+      return 'No knowledge source has been added yet.';
     }
 
     if (stats.knowledgeHealth >= 80) {
-      return "Most knowledge sources are ready for AI responses.";
+      return 'Most knowledge sources are ready for AI responses.';
     }
 
     if (stats.knowledgeHealth >= 50) {
-      return "Some knowledge sources are ready, but coverage can still be improved.";
+      return 'Some knowledge sources are ready, but coverage can still be improved.';
     }
 
-    return "Knowledge coverage is still low. Upload documents or publish articles.";
+    return 'Knowledge coverage is still low. Upload documents or publish articles.';
   };
 
   const settingInputClass =
-    "mt-2 h-12 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 text-sm font-semibold outline-none focus:border-blue-300 focus:bg-white focus:ring-4 focus:ring-blue-100";
+    'mt-2 h-12 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 text-sm font-semibold outline-none focus:border-blue-300 focus:bg-white focus:ring-4 focus:ring-blue-100';
 
   const settingTextareaClass =
-    "mt-2 w-full rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm leading-6 outline-none resize-none focus:border-blue-300 focus:bg-white focus:ring-4 focus:ring-blue-100";
+    'mt-2 w-full rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm leading-6 outline-none resize-none focus:border-blue-300 focus:bg-white focus:ring-4 focus:ring-blue-100';
 
   const settingLabelClass =
-    "text-xs font-black uppercase tracking-wide text-slate-400";
+    'text-xs font-black uppercase tracking-wide text-slate-400';
 
   return (
     <div className="min-h-screen bg-[#F6F8FC] flex">
@@ -786,25 +786,25 @@ export default function AiSettingsScreen({ setScreen }) {
               disabled={savingSettings || loading}
               className="h-10 px-4 rounded-2xl bg-blue-600 text-white text-sm font-bold disabled:opacity-60 disabled:cursor-not-allowed hover:bg-blue-700 transition"
             >
-              {savingSettings ? "Saving..." : saveStatus || "Save Settings"}
+              {savingSettings ? 'Saving...' : saveStatus || 'Save Settings'}
             </button>
           </div>
         </div>
 
         <div className="sticky top-16 z-20 border-b border-slate-200 bg-white/85 backdrop-blur-xl px-8 flex gap-6">
           {[
-            { id: "identify", label: "AI Identify", icon: Bot },
-            { id: "behavior", label: "Behavior", icon: BrainCircuit },
-            { id: "instructions", label: "Instructions", icon: Pencil },
+            { id: 'identify', label: 'AI Identify', icon: Bot },
+            { id: 'behavior', label: 'Behavior', icon: BrainCircuit },
+            { id: 'instructions', label: 'Instructions', icon: Pencil },
             {
-              id: "response_handoff",
-              label: "Response & Handoff",
+              id: 'response_handoff',
+              label: 'Response & Handoff',
               icon: MessageCircle,
             },
-            { id: "knowledge", label: "Knowledge", icon: BookOpen },
-            { id: "features", label: "Features", icon: Puzzle },
-            { id: "analytics", label: "Analytics", icon: BarChart3 },
-            { id: "hr-data", label: "HR Data", icon: User },
+            { id: 'knowledge', label: 'Knowledge', icon: BookOpen },
+            { id: 'features', label: 'Features', icon: Puzzle },
+            { id: 'analytics', label: 'Analytics', icon: BarChart3 },
+            { id: 'hr-data', label: 'HR Data', icon: User },
           ].map((tab) => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.id;
@@ -815,8 +815,8 @@ export default function AiSettingsScreen({ setScreen }) {
                 onClick={() => setActiveTab(tab.id)}
                 className={`flex items-center gap-2 px-1 py-4 text-sm font-bold border-b-2 transition duration-200 -mb-px relative cursor-pointer ${
                   isActive
-                    ? "border-blue-600 text-blue-600"
-                    : "border-transparent text-slate-500 hover:text-slate-800 hover:border-slate-300"
+                    ? 'border-blue-600 text-blue-600'
+                    : 'border-transparent text-slate-500 hover:text-slate-800 hover:border-slate-300'
                 }`}
               >
                 <Icon size={16} />
@@ -833,7 +833,7 @@ export default function AiSettingsScreen({ setScreen }) {
             </div>
           )}
 
-          {activeTab === "identify" && (
+          {activeTab === 'identify' && (
             <div className="space-y-6 animate-fadeIn">
               <section className="hidden grid xl:grid-cols-[1fr_360px] gap-5 items-stretch">
                 <div className="relative overflow-hidden rounded-[2rem] bg-slate-950 p-8 shadow-xl">
@@ -842,7 +842,7 @@ export default function AiSettingsScreen({ setScreen }) {
                   <div className="relative max-w-3xl">
                     <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-4 py-2 text-sm text-blue-50 mb-5">
                       <BrainCircuit size={16} />
-                      Bot: {activeBot?.name || "Loading..."}
+                      Bot: {activeBot?.name || 'Loading...'}
                     </div>
 
                     <h2 className="text-4xl font-black tracking-tight text-white">
@@ -865,7 +865,7 @@ export default function AiSettingsScreen({ setScreen }) {
                   </p>
                   <div className="mt-4 flex items-center gap-2 text-xs font-bold text-blue-600">
                     <Bot size={14} />
-                    Configuring {activeBot?.name || "AI Agent"}
+                    Configuring {activeBot?.name || 'AI Agent'}
                   </div>
                 </div>
               </section>
@@ -891,9 +891,9 @@ export default function AiSettingsScreen({ setScreen }) {
                   <label className="block">
                     <span className={settingLabelClass}>AI Name</span>
                     <input
-                      value={settings.ai_name || ""}
+                      value={settings.ai_name || ''}
                       onChange={(event) =>
-                        updateSettingField("ai_name", event.target.value)
+                        updateSettingField('ai_name', event.target.value)
                       }
                       className={settingInputClass}
                       placeholder="Customer Support AI"
@@ -903,9 +903,9 @@ export default function AiSettingsScreen({ setScreen }) {
                   <label className="block">
                     <span className={settingLabelClass}>Company Name</span>
                     <input
-                      value={settings.company_name || ""}
+                      value={settings.company_name || ''}
                       onChange={(event) =>
-                        updateSettingField("company_name", event.target.value)
+                        updateSettingField('company_name', event.target.value)
                       }
                       className={settingInputClass}
                       placeholder="Saasten"
@@ -915,11 +915,11 @@ export default function AiSettingsScreen({ setScreen }) {
                   <label className="block">
                     <span className={settingLabelClass}>Default Language</span>
                     <select
-                      value={settings.default_language || "id"}
+                      value={settings.default_language || 'id'}
                       onChange={(event) =>
                         updateSettingField(
-                          "default_language",
-                          event.target.value
+                          'default_language',
+                          event.target.value,
                         )
                       }
                       className={settingInputClass}
@@ -933,9 +933,9 @@ export default function AiSettingsScreen({ setScreen }) {
                   <label className="block">
                     <span className={settingLabelClass}>Tone</span>
                     <select
-                      value={settings.tone || "professional"}
+                      value={settings.tone || 'professional'}
                       onChange={(event) =>
-                        updateSettingField("tone", event.target.value)
+                        updateSettingField('tone', event.target.value)
                       }
                       className={settingInputClass}
                     >
@@ -951,9 +951,9 @@ export default function AiSettingsScreen({ setScreen }) {
                 <label className="block mt-5">
                   <span className={settingLabelClass}>Role Description</span>
                   <textarea
-                    value={settings.role_description || ""}
+                    value={settings.role_description || ''}
                     onChange={(event) =>
-                      updateSettingField("role_description", event.target.value)
+                      updateSettingField('role_description', event.target.value)
                     }
                     className={`${settingTextareaClass} h-32`}
                     placeholder="Example: You are a Customer Support Specialist for a SaaS company. Your role is to assist customers with product-related questions, troubleshoot common issues, provide accurate information based on company knowledge, and escalate complex cases to human agents when necessary."
@@ -982,9 +982,9 @@ export default function AiSettingsScreen({ setScreen }) {
                   <label className="block">
                     <span className={settingLabelClass}>Agent Role</span>
                     <select
-                      value={settings.agent_role || ""}
+                      value={settings.agent_role || ''}
                       onChange={(event) =>
-                        updateSettingField("agent_role", event.target.value)
+                        updateSettingField('agent_role', event.target.value)
                       }
                       className={settingInputClass}
                     >
@@ -999,9 +999,9 @@ export default function AiSettingsScreen({ setScreen }) {
                   <label className="block">
                     <span className={settingLabelClass}>Department</span>
                     <select
-                      value={settings.department || ""}
+                      value={settings.department || ''}
                       onChange={(event) =>
-                        updateSettingField("department", event.target.value)
+                        updateSettingField('department', event.target.value)
                       }
                       className={settingInputClass}
                     >
@@ -1024,11 +1024,11 @@ export default function AiSettingsScreen({ setScreen }) {
                   <label className="block">
                     <span className={settingLabelClass}>Primary Audience</span>
                     <select
-                      value={settings.primary_audience || ""}
+                      value={settings.primary_audience || ''}
                       onChange={(event) =>
                         updateSettingField(
-                          "primary_audience",
-                          event.target.value
+                          'primary_audience',
+                          event.target.value,
                         )
                       }
                       className={settingInputClass}
@@ -1056,7 +1056,7 @@ export default function AiSettingsScreen({ setScreen }) {
             </div>
           )}
 
-          {activeTab === "behavior" && (
+          {activeTab === 'behavior' && (
             <div className="space-y-6 animate-fadeIn">
               <div className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm">
                 <div className="flex items-start justify-between gap-5">
@@ -1079,9 +1079,9 @@ export default function AiSettingsScreen({ setScreen }) {
                   <label className="block">
                     <span className={settingLabelClass}>Response Style</span>
                     <select
-                      value={settings.response_style || "Helpful and concise"}
+                      value={settings.response_style || 'Helpful and concise'}
                       onChange={(event) =>
-                        updateSettingField("response_style", event.target.value)
+                        updateSettingField('response_style', event.target.value)
                       }
                       className={settingInputClass}
                     >
@@ -1109,9 +1109,9 @@ export default function AiSettingsScreen({ setScreen }) {
                   <label className="block">
                     <span className={settingLabelClass}>Empathy Level</span>
                     <select
-                      value={settings.empathy_level || "Medium"}
+                      value={settings.empathy_level || 'Medium'}
                       onChange={(event) =>
-                        updateSettingField("empathy_level", event.target.value)
+                        updateSettingField('empathy_level', event.target.value)
                       }
                       className={settingInputClass}
                     >
@@ -1124,11 +1124,11 @@ export default function AiSettingsScreen({ setScreen }) {
                   <label className="block">
                     <span className={settingLabelClass}>Formality Level</span>
                     <select
-                      value={settings.formality_level || "Professional"}
+                      value={settings.formality_level || 'Professional'}
                       onChange={(event) =>
                         updateSettingField(
-                          "formality_level",
-                          event.target.value
+                          'formality_level',
+                          event.target.value,
                         )
                       }
                       className={settingInputClass}
@@ -1146,10 +1146,10 @@ export default function AiSettingsScreen({ setScreen }) {
                     <span className={settingLabelClass}>Knowledge Mode</span>
                     <select
                       value={
-                        settings.knowledge_mode || "Approved Knowledge Only"
+                        settings.knowledge_mode || 'Approved Knowledge Only'
                       }
                       onChange={(event) =>
-                        updateSettingField("knowledge_mode", event.target.value)
+                        updateSettingField('knowledge_mode', event.target.value)
                       }
                       className={settingInputClass}
                     >
@@ -1171,11 +1171,11 @@ export default function AiSettingsScreen({ setScreen }) {
                     Unknown Answer Behavior
                   </span>
                   <textarea
-                    value={settings.unknown_answer_behavior || ""}
+                    value={settings.unknown_answer_behavior || ''}
                     onChange={(event) =>
                       updateSettingField(
-                        "unknown_answer_behavior",
-                        event.target.value
+                        'unknown_answer_behavior',
+                        event.target.value,
                       )
                     }
                     className={`${settingTextareaClass} h-32`}
@@ -1224,7 +1224,7 @@ export default function AiSettingsScreen({ setScreen }) {
             </div>
           )}
 
-          {activeTab === "instructions" && (
+          {activeTab === 'instructions' && (
             <div className="space-y-6 animate-fadeIn">
               <div className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm">
                 <h2 className="text-xl font-black text-slate-950">
@@ -1238,11 +1238,11 @@ export default function AiSettingsScreen({ setScreen }) {
                   <label className="block">
                     <span className={settingLabelClass}>Main Instruction</span>
                     <textarea
-                      value={settings.main_instruction || ""}
+                      value={settings.main_instruction || ''}
                       onChange={(event) =>
                         updateSettingField(
-                          "main_instruction",
-                          event.target.value
+                          'main_instruction',
+                          event.target.value,
                         )
                       }
                       className={`${settingTextareaClass} h-32 focus:ring-indigo-100`}
@@ -1252,11 +1252,11 @@ export default function AiSettingsScreen({ setScreen }) {
                   <label className="block">
                     <span className={settingLabelClass}>Business Context</span>
                     <textarea
-                      value={settings.business_context || ""}
+                      value={settings.business_context || ''}
                       onChange={(event) =>
                         updateSettingField(
-                          "business_context",
-                          event.target.value
+                          'business_context',
+                          event.target.value,
                         )
                       }
                       className={`${settingTextareaClass} h-32 focus:ring-indigo-100`}
@@ -1269,9 +1269,9 @@ export default function AiSettingsScreen({ setScreen }) {
                       Restrictions / Larangan Agent & LLM
                     </span>
                     <textarea
-                      value={settings.restrictions || ""}
+                      value={settings.restrictions || ''}
                       onChange={(event) =>
-                        updateSettingField("restrictions", event.target.value)
+                        updateSettingField('restrictions', event.target.value)
                       }
                       className={`${settingTextareaClass} h-32 focus:ring-indigo-100`}
                       placeholder="Jangan mengarang informasi. Jangan menjanjikan harga. Jangan menjawab di luar knowledge base..."
@@ -1281,11 +1281,11 @@ export default function AiSettingsScreen({ setScreen }) {
                   <label className="block">
                     <span className={settingLabelClass}>Fallback Message</span>
                     <textarea
-                      value={settings.fallback_message || ""}
+                      value={settings.fallback_message || ''}
                       onChange={(event) =>
                         updateSettingField(
-                          "fallback_message",
-                          event.target.value
+                          'fallback_message',
+                          event.target.value,
                         )
                       }
                       className={`${settingTextareaClass} h-32 focus:ring-indigo-100`}
@@ -1318,8 +1318,8 @@ export default function AiSettingsScreen({ setScreen }) {
                       value={arrayToText(settings.forbidden_topics)}
                       onChange={(event) =>
                         updateSettingField(
-                          "forbidden_topics",
-                          event.target.value
+                          'forbidden_topics',
+                          event.target.value,
                         )
                       }
                       className={`${settingTextareaClass} h-32`}
@@ -1333,8 +1333,8 @@ export default function AiSettingsScreen({ setScreen }) {
                       value={arrayToText(settings.sensitive_topics)}
                       onChange={(event) =>
                         updateSettingField(
-                          "sensitive_topics",
-                          event.target.value
+                          'sensitive_topics',
+                          event.target.value,
                         )
                       }
                       className={`${settingTextareaClass} h-32`}
@@ -1348,8 +1348,8 @@ export default function AiSettingsScreen({ setScreen }) {
                       value={arrayToText(settings.escalation_topics)}
                       onChange={(event) =>
                         updateSettingField(
-                          "escalation_topics",
-                          event.target.value
+                          'escalation_topics',
+                          event.target.value,
                         )
                       }
                       className={`${settingTextareaClass} h-32`}
@@ -1362,7 +1362,7 @@ export default function AiSettingsScreen({ setScreen }) {
                     <textarea
                       value={arrayToText(settings.never_promise)}
                       onChange={(event) =>
-                        updateSettingField("never_promise", event.target.value)
+                        updateSettingField('never_promise', event.target.value)
                       }
                       className={`${settingTextareaClass} h-32`}
                       placeholder="salary increase, refund approval, delivery guarantee"
@@ -1376,8 +1376,8 @@ export default function AiSettingsScreen({ setScreen }) {
                     value={arrayToText(settings.restricted_claims)}
                     onChange={(event) =>
                       updateSettingField(
-                        "restricted_claims",
-                        event.target.value
+                        'restricted_claims',
+                        event.target.value,
                       )
                     }
                     className={`${settingTextareaClass} h-32`}
@@ -1388,11 +1388,11 @@ export default function AiSettingsScreen({ setScreen }) {
                 <label className="block mt-5">
                   <span className={settingLabelClass}>Custom Instruction</span>
                   <textarea
-                    value={settings.custom_instruction || ""}
+                    value={settings.custom_instruction || ''}
                     onChange={(event) =>
                       updateSettingField(
-                        "custom_instruction",
-                        event.target.value
+                        'custom_instruction',
+                        event.target.value,
                       )
                     }
                     className={`${settingTextareaClass} h-32`}
@@ -1403,7 +1403,7 @@ export default function AiSettingsScreen({ setScreen }) {
             </div>
           )}
 
-          {activeTab === "response_handoff" && (
+          {activeTab === 'response_handoff' && (
             <div className="grid xl:grid-cols-[1fr_420px] gap-5 animate-fadeIn">
               <div className="space-y-5">
                 <div className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm">
@@ -1427,11 +1427,11 @@ export default function AiSettingsScreen({ setScreen }) {
                     <label className="block">
                       <span className={settingLabelClass}>Answer Length</span>
                       <select
-                        value={settings.answer_length || "medium"}
+                        value={settings.answer_length || 'medium'}
                         onChange={(event) =>
                           updateSettingField(
-                            "answer_length",
-                            event.target.value
+                            'answer_length',
+                            event.target.value,
                           )
                         }
                         className={settingInputClass}
@@ -1455,8 +1455,8 @@ export default function AiSettingsScreen({ setScreen }) {
                         value={settings.confidence_threshold ?? 0.7}
                         onChange={(event) =>
                           updateSettingField(
-                            "confidence_threshold",
-                            Number(event.target.value)
+                            'confidence_threshold',
+                            Number(event.target.value),
                           )
                         }
                         className={settingInputClass}
@@ -1466,9 +1466,9 @@ export default function AiSettingsScreen({ setScreen }) {
 
                   <div className="mt-6 grid md:grid-cols-2 gap-3">
                     {[
-                      ["use_bullets", "Use bullet points"],
-                      ["ask_follow_up", "Ask follow-up question"],
-                      ["show_sources", "Show knowledge sources"],
+                      ['use_bullets', 'Use bullet points'],
+                      ['ask_follow_up', 'Ask follow-up question'],
+                      ['show_sources', 'Show knowledge sources'],
                     ].map(([field, label]) => (
                       <ToggleSwitch
                         key={field}
@@ -1501,11 +1501,11 @@ export default function AiSettingsScreen({ setScreen }) {
                     <label className="block">
                       <span className={settingLabelClass}>Handoff Target</span>
                       <input
-                        value={settings.handoff_target || ""}
+                        value={settings.handoff_target || ''}
                         onChange={(event) =>
                           updateSettingField(
-                            "handoff_target",
-                            event.target.value
+                            'handoff_target',
+                            event.target.value,
                           )
                         }
                         className={settingInputClass}
@@ -1516,14 +1516,14 @@ export default function AiSettingsScreen({ setScreen }) {
 
                   <div className="mt-6 grid md:grid-cols-2 gap-3">
                     {[
-                      ["handoff_when_no_answer", "Handoff when no answer"],
+                      ['handoff_when_no_answer', 'Handoff when no answer'],
                       [
-                        "handoff_when_customer_requests_agent",
-                        "Handoff when customer asks human",
+                        'handoff_when_customer_requests_agent',
+                        'Handoff when customer asks human',
                       ],
                       [
-                        "handoff_when_pricing_request",
-                        "Handoff for pricing/proposal request",
+                        'handoff_when_pricing_request',
+                        'Handoff for pricing/proposal request',
                       ],
                     ].map(([field, label]) => (
                       <ToggleSwitch
@@ -1549,11 +1549,11 @@ export default function AiSettingsScreen({ setScreen }) {
 
                   <div className="mt-5 space-y-3 text-sm">
                     {[
-                      ["Agent Role", settings.agent_role || "-"],
-                      ["Department", settings.department || "-"],
-                      ["Audience", settings.primary_audience || "-"],
-                      ["Knowledge Mode", settings.knowledge_mode || "-"],
-                      ["Handoff Target", settings.handoff_target || "-"],
+                      ['Agent Role', settings.agent_role || '-'],
+                      ['Department', settings.department || '-'],
+                      ['Audience', settings.primary_audience || '-'],
+                      ['Knowledge Mode', settings.knowledge_mode || '-'],
+                      ['Handoff Target', settings.handoff_target || '-'],
                     ].map(([label, value]) => (
                       <div
                         key={label}
@@ -1571,7 +1571,7 @@ export default function AiSettingsScreen({ setScreen }) {
             </div>
           )}
 
-          {activeTab === "features" && (
+          {activeTab === 'features' && (
             <div className="space-y-5 animate-fadeIn">
               <div className="rounded-[2rem] border border-slate-200 bg-white shadow-sm overflow-hidden">
                 <div className="p-6 border-b border-slate-200 flex items-center justify-between">
@@ -1618,11 +1618,11 @@ export default function AiSettingsScreen({ setScreen }) {
                                 <span
                                   className={`rounded-full px-3 py-1 text-[11px] font-black ${
                                     feature.is_enabled
-                                      ? "bg-emerald-50 text-emerald-700"
-                                      : "bg-slate-100 text-slate-600"
+                                      ? 'bg-emerald-50 text-emerald-700'
+                                      : 'bg-slate-100 text-slate-600'
                                   }`}
                                 >
-                                  {feature.is_enabled ? "Enabled" : "Disabled"}
+                                  {feature.is_enabled ? 'Enabled' : 'Disabled'}
                                 </span>
                               </div>
 
@@ -1639,15 +1639,15 @@ export default function AiSettingsScreen({ setScreen }) {
                                   onClick={() => handleToggleFeature(feature)}
                                   className={`relative inline-flex h-6 w-11 shrink-0 rounded-full border-2 border-transparent transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed ${
                                     feature.is_enabled
-                                      ? "bg-blue-600"
-                                      : "bg-slate-200"
+                                      ? 'bg-blue-600'
+                                      : 'bg-slate-200'
                                   }`}
                                 >
                                   <span
                                     className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-md transition duration-200 ${
                                       feature.is_enabled
-                                        ? "translate-x-5"
-                                        : "translate-x-0"
+                                        ? 'translate-x-5'
+                                        : 'translate-x-0'
                                     }`}
                                   />
                                 </button>
@@ -1667,8 +1667,8 @@ export default function AiSettingsScreen({ setScreen }) {
                                 className="h-9 px-4 rounded-xl border border-red-100 bg-red-50 text-red-600 text-xs font-black hover:bg-red-100 transition disabled:opacity-50 disabled:cursor-not-allowed"
                               >
                                 {deletingFeatureId === feature.id
-                                  ? "Deleting..."
-                                  : "Delete"}
+                                  ? 'Deleting...'
+                                  : 'Delete'}
                               </button>
                             </div>
                           </div>
@@ -1681,7 +1681,7 @@ export default function AiSettingsScreen({ setScreen }) {
             </div>
           )}
 
-          {activeTab === "knowledge" && (
+          {activeTab === 'knowledge' && (
             <div className="grid xl:grid-cols-[1fr_420px] gap-5 animate-fadeIn">
               <div className="space-y-5">
                 <div className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm">
@@ -1694,7 +1694,7 @@ export default function AiSettingsScreen({ setScreen }) {
                       </p>
 
                       <p className="mt-2 text-4xl font-black text-slate-950">
-                        {loading ? "..." : `${stats.knowledgeHealth}%`}
+                        {loading ? '...' : `${stats.knowledgeHealth}%`}
                       </p>
 
                       <p className="mt-2 text-sm text-slate-600">
@@ -1708,7 +1708,7 @@ export default function AiSettingsScreen({ setScreen }) {
                           Documents
                         </p>
                         <p className="mt-2 text-2xl font-black text-slate-950">
-                          {loading ? "..." : stats.totalDocuments}
+                          {loading ? '...' : stats.totalDocuments}
                         </p>
                       </div>
 
@@ -1717,7 +1717,7 @@ export default function AiSettingsScreen({ setScreen }) {
                           Articles
                         </p>
                         <p className="mt-2 text-2xl font-black text-slate-950">
-                          {loading ? "..." : stats.totalArticles}
+                          {loading ? '...' : stats.totalArticles}
                         </p>
                       </div>
 
@@ -1726,7 +1726,7 @@ export default function AiSettingsScreen({ setScreen }) {
                           Indexed
                         </p>
                         <p className="mt-2 text-2xl font-black text-slate-950">
-                          {loading ? "..." : stats.indexedDocuments}
+                          {loading ? '...' : stats.indexedDocuments}
                         </p>
                       </div>
 
@@ -1735,7 +1735,7 @@ export default function AiSettingsScreen({ setScreen }) {
                           Published
                         </p>
                         <p className="mt-2 text-2xl font-black text-slate-950">
-                          {loading ? "..." : stats.publishedArticles}
+                          {loading ? '...' : stats.publishedArticles}
                         </p>
                       </div>
                     </div>
@@ -1770,7 +1770,7 @@ export default function AiSettingsScreen({ setScreen }) {
                         className=" px-4 py-1 rounded-2xl bg-blue-600 text-white text-sm font-bold flex items-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed hover:bg-blue-700 transition"
                       >
                         <Plus size={16} />
-                        {uploading ? "Uploading..." : "Upload File"}
+                        {uploading ? 'Uploading...' : 'Upload File'}
                       </button>
                     </div>
                   </div>
@@ -1821,9 +1821,9 @@ export default function AiSettingsScreen({ setScreen }) {
                                 </p>
 
                                 <p className="mt-1 text-xs text-slate-500">
-                                  {formatSourceType(doc.source_type)} ·{" "}
-                                  {doc.total_chunks || 0} chunks ·{" "}
-                                  {doc.indexed_chunks || 0} indexed · Updated{" "}
+                                  {formatSourceType(doc.source_type)} ·{' '}
+                                  {doc.total_chunks || 0} chunks ·{' '}
+                                  {doc.indexed_chunks || 0} indexed · Updated{' '}
                                   {formatUpdatedAt(doc.updated_at)}
                                 </p>
 
@@ -1851,10 +1851,10 @@ export default function AiSettingsScreen({ setScreen }) {
                                     className="h-8 px-3 rounded-xl bg-slate-950 text-white text-[11px] font-black disabled:opacity-60"
                                   >
                                     {indexingDocumentId === doc.id
-                                      ? "Indexing..."
-                                      : doc.status === "indexed"
-                                      ? "Re-index"
-                                      : "Index"}
+                                      ? 'Indexing...'
+                                      : doc.status === 'indexed'
+                                        ? 'Re-index'
+                                        : 'Index'}
                                   </button>
                                 )}
 
@@ -1874,7 +1874,7 @@ export default function AiSettingsScreen({ setScreen }) {
 
                                 <span
                                   className={`rounded-full px-3 py-1 text-[11px] font-black ${getStatusClass(
-                                    doc.status
+                                    doc.status,
                                   )}`}
                                 >
                                   {formatStatus(doc.status)}
@@ -1883,15 +1883,15 @@ export default function AiSettingsScreen({ setScreen }) {
 
                               <p className="text-[11px] text-slate-400">
                                 {getDocumentExtension(doc)?.toUpperCase() ||
-                                  "UNKNOWN"}{" "}
-                                ·{" "}
-                                {doc.status === "indexed"
-                                  ? "Ready for AI"
-                                  : doc.status === "processing"
-                                  ? "Processing"
-                                  : doc.status === "failed"
-                                  ? "Needs attention"
-                                  : "Awaiting indexing"}
+                                  'UNKNOWN'}{' '}
+                                ·{' '}
+                                {doc.status === 'indexed'
+                                  ? 'Ready for AI'
+                                  : doc.status === 'processing'
+                                    ? 'Processing'
+                                    : doc.status === 'failed'
+                                      ? 'Needs attention'
+                                      : 'Awaiting indexing'}
                               </p>
                             </div>
                           </div>
@@ -1924,7 +1924,7 @@ export default function AiSettingsScreen({ setScreen }) {
                     <input
                       value={articleForm.title}
                       onChange={(event) =>
-                        updateArticleForm("title", event.target.value)
+                        updateArticleForm('title', event.target.value)
                       }
                       className="h-12 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 text-sm font-semibold outline-none"
                       placeholder="Article title"
@@ -1934,7 +1934,7 @@ export default function AiSettingsScreen({ setScreen }) {
                       <input
                         value={articleForm.category}
                         onChange={(event) =>
-                          updateArticleForm("category", event.target.value)
+                          updateArticleForm('category', event.target.value)
                         }
                         className="h-12 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 text-sm font-semibold outline-none"
                         placeholder="Category"
@@ -1943,7 +1943,7 @@ export default function AiSettingsScreen({ setScreen }) {
                       <select
                         value={articleForm.status}
                         onChange={(event) =>
-                          updateArticleForm("status", event.target.value)
+                          updateArticleForm('status', event.target.value)
                         }
                         className="h-12 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 text-sm font-semibold outline-none"
                       >
@@ -1955,7 +1955,7 @@ export default function AiSettingsScreen({ setScreen }) {
                     <input
                       value={articleForm.tags}
                       onChange={(event) =>
-                        updateArticleForm("tags", event.target.value)
+                        updateArticleForm('tags', event.target.value)
                       }
                       className="h-12 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 text-sm font-semibold outline-none"
                       placeholder="Tags: salesforce, crm, pricing"
@@ -1964,7 +1964,7 @@ export default function AiSettingsScreen({ setScreen }) {
                     <textarea
                       value={articleForm.content}
                       onChange={(event) =>
-                        updateArticleForm("content", event.target.value)
+                        updateArticleForm('content', event.target.value)
                       }
                       className="h-40 w-full rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm outline-none resize-none"
                       placeholder="Write knowledge content here..."
@@ -1975,7 +1975,7 @@ export default function AiSettingsScreen({ setScreen }) {
                       disabled={savingArticle}
                       className="h-11 w-full rounded-2xl bg-emerald-600 text-white text-sm font-black disabled:opacity-60 hover:bg-emerald-700 transition"
                     >
-                      {savingArticle ? "Adding..." : "Add Article"}
+                      {savingArticle ? 'Adding...' : 'Add Article'}
                     </button>
                   </div>
                 </form>
@@ -1985,7 +1985,7 @@ export default function AiSettingsScreen({ setScreen }) {
                     Knowledge Articles
                   </h2>
                   <p className="mt-1 text-sm text-slate-500">
-                    {loading ? "Loading..." : `${articles.length} articles`}
+                    {loading ? 'Loading...' : `${articles.length} articles`}
                   </p>
 
                   <div className="mt-5 space-y-3">
@@ -2013,7 +2013,7 @@ export default function AiSettingsScreen({ setScreen }) {
                                 {article.title}
                               </p>
                               <p className="mt-1 text-xs text-slate-500">
-                                {article.category || "Uncategorized"} ·{" "}
+                                {article.category || 'Uncategorized'} ·{' '}
                                 {article.status}
                               </p>
                             </div>
@@ -2050,7 +2050,7 @@ export default function AiSettingsScreen({ setScreen }) {
                               onChange={(event) =>
                                 updateArticleStatus(
                                   article.id,
-                                  event.target.value
+                                  event.target.value,
                                 )
                               }
                               className="h-10 w-full rounded-2xl border border-slate-200 bg-white px-3 text-sm font-semibold outline-none"
@@ -2073,42 +2073,42 @@ export default function AiSettingsScreen({ setScreen }) {
                     <div className="flex justify-between">
                       <span className="text-slate-500">Uploaded</span>
                       <span className="font-black text-blue-600">
-                        {loading ? "..." : stats.uploadedDocuments}
+                        {loading ? '...' : stats.uploadedDocuments}
                       </span>
                     </div>
 
                     <div className="flex justify-between">
                       <span className="text-slate-500">Processing</span>
                       <span className="font-black text-amber-600">
-                        {loading ? "..." : stats.processingDocuments}
+                        {loading ? '...' : stats.processingDocuments}
                       </span>
                     </div>
 
                     <div className="flex justify-between">
                       <span className="text-slate-500">Failed</span>
                       <span className="font-black text-red-600">
-                        {loading ? "..." : stats.failedDocuments}
+                        {loading ? '...' : stats.failedDocuments}
                       </span>
                     </div>
 
                     <div className="flex justify-between">
                       <span className="text-slate-500">Indexed Chunks</span>
                       <span className="font-black text-slate-950">
-                        {loading ? "..." : stats.indexedChunks}
+                        {loading ? '...' : stats.indexedChunks}
                       </span>
                     </div>
 
                     <div className="flex justify-between">
                       <span className="text-slate-500">Stored Chunks</span>
                       <span className="font-black text-slate-950">
-                        {loading ? "..." : stats.storedChunks}
+                        {loading ? '...' : stats.storedChunks}
                       </span>
                     </div>
 
                     <div className="flex justify-between">
                       <span className="text-slate-500">Draft Articles</span>
                       <span className="font-black text-slate-950">
-                        {loading ? "..." : stats.draftArticles}
+                        {loading ? '...' : stats.draftArticles}
                       </span>
                     </div>
                   </div>
@@ -2117,7 +2117,7 @@ export default function AiSettingsScreen({ setScreen }) {
             </div>
           )}
 
-          {activeTab === "analytics" && (
+          {activeTab === 'analytics' && (
             <div className="space-y-6 animate-fadeIn">
               <div className="grid md:grid-cols-3 gap-5">
                 <div className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm">
@@ -2185,7 +2185,7 @@ export default function AiSettingsScreen({ setScreen }) {
                         <div key={rating}>
                           <div className="flex items-center justify-between mb-2">
                             <span className="text-sm font-semibold text-slate-700">
-                              {rating} Star{rating > 1 ? "s" : ""}
+                              {rating} Star{rating > 1 ? 's' : ''}
                             </span>
 
                             <span className="text-sm font-black text-slate-950">
@@ -2248,7 +2248,7 @@ export default function AiSettingsScreen({ setScreen }) {
                           </div>
 
                           <p className="mt-3 text-sm leading-6 text-slate-600">
-                            {feedback.feedback_text || "No comment provided."}
+                            {feedback.feedback_text || 'No comment provided.'}
                           </p>
                         </div>
                       ))
@@ -2259,9 +2259,9 @@ export default function AiSettingsScreen({ setScreen }) {
             </div>
           )}
 
-          {activeTab === "hr-data" && (
+          {activeTab === 'hr-data' && (
             <div className="space-y-6 animate-fadeIn">
-              <div className="grid md:grid-cols-3 gap-5">
+              <div className="grid md:grid-cols-4 gap-5">
                 <div className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm">
                   <p className="text-xs font-black uppercase tracking-wide text-slate-400">
                     Total Employees
@@ -2278,10 +2278,12 @@ export default function AiSettingsScreen({ setScreen }) {
 
                 <div className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm">
                   <p className="text-xs font-black uppercase tracking-wide text-slate-400">
-                    Open Vacancies
+                    Total Vacancies
                   </p>
 
-                  <p className="mt-3 text-4xl font-black text-slate-950">12</p>
+                  <p className="mt-3 text-4xl font-black text-slate-950">
+                    {vacancies.length}
+                  </p>
 
                   <p className="mt-2 text-sm text-slate-500">
                     Active positions
@@ -2290,10 +2292,34 @@ export default function AiSettingsScreen({ setScreen }) {
 
                 <div className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm">
                   <p className="text-xs font-black uppercase tracking-wide text-slate-400">
-                    Departments
+                    Open Vacancies
                   </p>
 
-                  <p className="mt-3 text-4xl font-black text-slate-950">8</p>
+                  <p className="mt-3 text-4xl font-black text-slate-950">
+                    {
+                      vacancies.filter(
+                        (vacancy) => vacancy.vacancy_status === 'open',
+                      ).length
+                    }
+                  </p>
+
+                  <p className="mt-2 text-sm text-slate-500">
+                    Registered departments
+                  </p>
+                </div>
+
+                <div className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm">
+                  <p className="text-xs font-black uppercase tracking-wide text-slate-400">
+                    Closed Vacancies
+                  </p>
+
+                  <p className="mt-3 text-4xl font-black text-slate-950">
+                    {
+                      vacancies.filter(
+                        (vacancy) => vacancy.vacancy_status !== 'open',
+                      ).length
+                    }
+                  </p>
 
                   <p className="mt-2 text-sm text-slate-500">
                     Registered departments
@@ -2385,16 +2411,16 @@ export default function AiSettingsScreen({ setScreen }) {
                                   handleEmployeeStatusToggle(employee)
                                 }
                                 className={`relative inline-flex h-7 w-12 items-center rounded-full transition ${
-                                  employee.employee_status === "active"
-                                    ? "bg-blue-600"
-                                    : "bg-slate-300"
+                                  employee.employee_status === 'active'
+                                    ? 'bg-blue-600'
+                                    : 'bg-slate-300'
                                 }`}
                               >
                                 <span
                                   className={`inline-block h-5 w-5 transform rounded-full bg-white transition ${
-                                    employee.employee_status === "active"
-                                      ? "translate-x-6"
-                                      : "translate-x-1"
+                                    employee.employee_status === 'active'
+                                      ? 'translate-x-6'
+                                      : 'translate-x-1'
                                   }`}
                                 />
                               </button>
@@ -2501,12 +2527,12 @@ export default function AiSettingsScreen({ setScreen }) {
 
                           <td className="px-4 py-4 text-sm text-slate-600">
                             {vacancy.employment_type
-                              ?.split("_")
+                              ?.split('_')
                               .map(
                                 (word) =>
-                                  word.charAt(0).toUpperCase() + word.slice(1)
+                                  word.charAt(0).toUpperCase() + word.slice(1),
                               )
-                              .join(" ")}
+                              .join(' ')}
                           </td>
 
                           <td className="px-4 py-4 text-sm text-slate-600">
@@ -2516,11 +2542,11 @@ export default function AiSettingsScreen({ setScreen }) {
                           <td className="px-4 py-4 text-sm text-slate-600">
                             <span
                               className={`rounded-full px-3 py-1 text-xs font-semibold ${
-                                vacancy.vacancy_status === "open"
-                                  ? "bg-emerald-100 text-emerald-700"
-                                  : vacancy.vacancy_status === "draft"
-                                  ? "bg-amber-100 text-amber-700"
-                                  : "bg-slate-100 text-slate-600"
+                                vacancy.vacancy_status === 'open'
+                                  ? 'bg-emerald-100 text-emerald-700'
+                                  : vacancy.vacancy_status === 'draft'
+                                    ? 'bg-amber-100 text-amber-700'
+                                    : 'bg-slate-100 text-slate-600'
                               }`}
                             >
                               {vacancy.vacancy_status}
@@ -2542,8 +2568,8 @@ export default function AiSettingsScreen({ setScreen }) {
                                 className="rounded-xl border border-red-200 bg-red-50 px-5 py-2 text-sm font-semibold text-red-600 transition hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-50"
                               >
                                 {deletingVacancyId === vacancy.id
-                                  ? "Deleting..."
-                                  : "Delete"}
+                                  ? 'Deleting...'
+                                  : 'Delete'}
                               </button>
                             </div>
                           </td>
@@ -2562,7 +2588,7 @@ export default function AiSettingsScreen({ setScreen }) {
                 <div className="w-full max-w-2xl my-8 rounded-[2rem] bg-white shadow-2xl overflow-hidden">
                   <div className="border-b border-slate-200 px-6 py-5 flex items-center justify-between">
                     <h2 className="text-xl font-black text-slate-950">
-                      {editingFeature ? "Configure Feature" : "Add Feature"}
+                      {editingFeature ? 'Configure Feature' : 'Add Feature'}
                     </h2>
                   </div>
 
@@ -2624,8 +2650,8 @@ export default function AiSettingsScreen({ setScreen }) {
                                   }
                                   label={
                                     featureForm.is_enabled
-                                      ? "Active"
-                                      : "Inactive"
+                                      ? 'Active'
+                                      : 'Inactive'
                                   }
                                 />
                               </div>
@@ -2682,10 +2708,10 @@ export default function AiSettingsScreen({ setScreen }) {
                         className="h-11 px-5 rounded-2xl bg-blue-600 text-white text-sm font-bold disabled:opacity-60 disabled:cursor-not-allowed"
                       >
                         {editingFeature
-                          ? "Save Changes"
+                          ? 'Save Changes'
                           : creatingFeature
-                          ? "Creating..."
-                          : "Create Feature"}
+                            ? 'Creating...'
+                            : 'Create Feature'}
                       </button>
                     </div>
                   </form>
@@ -2700,13 +2726,13 @@ export default function AiSettingsScreen({ setScreen }) {
                 <div className="flex items-center justify-between">
                   <div>
                     <h2 className="text-2xl font-black text-slate-950">
-                      {selectedEmployee ? "Edit Employee" : "Add Employee"}
+                      {selectedEmployee ? 'Edit Employee' : 'Add Employee'}
                     </h2>
 
                     <p className="mt-1 text-sm text-slate-500">
                       {selectedEmployee
-                        ? "Update employee information."
-                        : "Create a new employee record."}
+                        ? 'Update employee information.'
+                        : 'Create a new employee record.'}
                     </p>
                   </div>
 
@@ -2922,7 +2948,7 @@ export default function AiSettingsScreen({ setScreen }) {
                     onClick={handleSaveEmployee}
                     className="rounded-xl bg-blue-600 px-4 py-2 font-semibold text-white hover:bg-blue-700"
                   >
-                    {selectedEmployee ? "Update Employee" : "Create Employee"}
+                    {selectedEmployee ? 'Update Employee' : 'Create Employee'}
                   </button>
                 </div>
               </div>
@@ -2935,7 +2961,7 @@ export default function AiSettingsScreen({ setScreen }) {
                 <div className="flex items-center justify-between p-6">
                   <div>
                     <h2 className="text-2xl font-black text-slate-950">
-                      {selectedVacancy ? "Edit Vacancy" : "Add Vacancy"}
+                      {selectedVacancy ? 'Edit Vacancy' : 'Add Vacancy'}
                     </h2>
 
                     <p className="mt-1 text-sm text-slate-500">
@@ -3167,7 +3193,7 @@ export default function AiSettingsScreen({ setScreen }) {
                         onChange={(e) =>
                           setVacancyForm({
                             ...vacancyForm,
-                            show_salary: e.target.value === "true",
+                            show_salary: e.target.value === 'true',
                           })
                         }
                         className="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3"
@@ -3316,7 +3342,7 @@ export default function AiSettingsScreen({ setScreen }) {
                     onClick={handleSaveVacancy}
                     className="rounded-xl bg-blue-600 px-4 py-2 font-semibold text-white transition hover:bg-blue-700"
                   >
-                    {selectedVacancy ? "Update Vacancy" : "Create Vacancy"}
+                    {selectedVacancy ? 'Update Vacancy' : 'Create Vacancy'}
                   </button>
                 </div>
               </div>
