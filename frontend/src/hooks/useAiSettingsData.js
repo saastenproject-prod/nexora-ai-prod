@@ -1110,6 +1110,19 @@ export default function useAiSettingsData() {
     }
   };
 
+  const isFeatureNameExistsForCreate = async (botId, featureName) => {
+    const { data, error } = await supabase
+      .from('bot_features')
+      .select('id')
+      .eq('bot_id', botId)
+      .ilike('feature_name', featureName)
+      .limit(1);
+
+    if (error) throw error;
+
+    return data.length > 0;
+  };
+
   const isFeatureNameExistsForUpdate = async (
     botId,
     featureId,
@@ -1142,7 +1155,7 @@ export default function useAiSettingsData() {
         currentBot = result.bot;
       }
 
-      const exists = await isFeatureNameExists(
+      const exists = await isFeatureNameExistsForCreate(
         currentBot.id,
         payload.feature_name,
       );
