@@ -1,4 +1,5 @@
 import ChatbotSubnav from '../components/layout/ChatbotSubnav';
+import toast from 'react-hot-toast';
 import { useRef, useState } from 'react';
 import {
   BookOpen,
@@ -215,8 +216,10 @@ export default function AiSettingsScreen({ setScreen }) {
     try {
       await uploadKnowledgeDocument(file);
       event.target.value = '';
+      toast.success(`File "${file.name}" uploaded successfully`);
     } catch (err) {
       // Error sudah ditampilkan dari hook.
+      toast.error(`Failed to upload file "${file.name}". Please try again.`);
     } finally {
       setUploading(false);
     }
@@ -227,8 +230,12 @@ export default function AiSettingsScreen({ setScreen }) {
 
     try {
       await indexTextKnowledgeDocument(document);
+      toast.success(`Document "${document.file_name}" indexed successfully`);
     } catch (err) {
       // Error sudah ditampilkan dari hook.
+      toast.error(
+        `Failed to index document "${document.file_name}". Please try again.`,
+      );
     } finally {
       setIndexingDocumentId(null);
     }
@@ -243,7 +250,11 @@ export default function AiSettingsScreen({ setScreen }) {
 
     try {
       await deleteKnowledgeDocument(document);
+      toast.success('Document deleted successfully');
     } catch (err) {
+      toast.error(
+        `Failed to delete document "${document.file_name}". Please try again.`,
+      );
       // Error sudah ditampilkan dari hook.
     }
   };
@@ -263,12 +274,13 @@ export default function AiSettingsScreen({ setScreen }) {
     try {
       await saveSettings();
       setSaveStatus('Saved');
-
+      toast.success('Settings saved successfully');
       setTimeout(() => {
         setSaveStatus('');
       }, 1800);
     } catch (err) {
       setSaveStatus('Save failed');
+      toast.error(err.message || 'Failed to save settings');
 
       setTimeout(() => {
         setSaveStatus('');
@@ -293,9 +305,13 @@ export default function AiSettingsScreen({ setScreen }) {
 
     try {
       await createArticle(articleForm);
+      toast.success(`Article "${articleForm.title}" created successfully`);
       setArticleForm(DEFAULT_ARTICLE_FORM);
     } catch (err) {
       setArticleError(err?.message || 'Failed to create article.');
+      toast.error(
+        err?.message || 'Failed to create article. Please try again.',
+      );
     }
   };
 
@@ -304,7 +320,14 @@ export default function AiSettingsScreen({ setScreen }) {
 
     if (!confirmed) return;
 
-    await deleteArticle(article.id);
+    try {
+      await deleteArticle(article.id);
+      toast.success('Article deleted successfully');
+    } catch (err) {
+      toast.error(
+        `Failed to delete article "${article.title}". Please try again.`,
+      );
+    }
   };
 
   // EMPLOYEE STUFF
@@ -337,8 +360,10 @@ export default function AiSettingsScreen({ setScreen }) {
       setLoadingMessage('Updating employee...');
 
       await handleToggleEmployeeStatus(employee);
+      toast.success('Employee status updated successfully');
     } catch (error) {
       console.error(error);
+      toast.error('Failed to update employee status');
     } finally {
       setLoadingMessage('');
     }
@@ -365,21 +390,34 @@ export default function AiSettingsScreen({ setScreen }) {
   };
 
   const handleSaveEmployee = async () => {
-    let success = false;
+    try {
+      if (selectedEmployee) {
+        setLoadingMessage('Updating employee...');
 
-    if (selectedEmployee) {
-      setLoadingMessage('Updating employee...');
-      success = await updateEmployee(selectedEmployee.id, employeeForm);
-    } else {
-      setLoadingMessage('Creating employee...');
-      success = await createEmployee(employeeForm);
+        await updateEmployee(selectedEmployee.id, employeeForm);
+
+        toast.success(
+          `Employee "${employeeForm.full_name}" updated successfully`,
+        );
+      } else {
+        setLoadingMessage('Creating employee...');
+
+        await createEmployee(employeeForm);
+
+        toast.success(
+          `Employee "${employeeForm.full_name}" created successfully`,
+        );
+      }
+
+      setIsEmployeeModalOpen(false);
+      setSelectedEmployee(null);
+    } catch (error) {
+      console.error(error);
+
+      toast.error(error?.message || 'Failed to save employee');
+    } finally {
+      setLoadingMessage('');
     }
-
-    if (!success) return;
-
-    setIsEmployeeModalOpen(false);
-    setSelectedEmployee(null);
-    setLoadingMessage('');
   };
 
   const handleDeleteEmployee = async (employee) => {
@@ -394,9 +432,10 @@ export default function AiSettingsScreen({ setScreen }) {
     setLoadingMessage('Deleting employee...');
 
     const success = await deleteEmployee(employee.id);
+    toast.success(`Employee "${employee.full_name}" deleted successfully`);
 
     if (!success) {
-      alert('Failed to delete employee');
+      toast.error('Failed to delete employee');
     }
 
     setLoadingMessage('');
@@ -600,9 +639,17 @@ export default function AiSettingsScreen({ setScreen }) {
       setCreatingFeature(true);
 
       if (editingFeature) {
+        setLoadingMessage('Updating feature...');
         await updateFeature(editingFeature.id, featureForm);
+        toast.success(
+          `Feature "${featureForm.feature_name}" updated successfully`,
+        );
       } else {
+        setLoadingMessage('Creating feature...');
         await createFeature(featureForm);
+        toast.success(
+          `Feature "${featureForm.feature_name}" created successfully`,
+        );
       }
 
       setFeatureForm(DEFAULT_FEATURE_FORM);
@@ -610,8 +657,10 @@ export default function AiSettingsScreen({ setScreen }) {
       setShowCreateFeatureModal(false);
     } catch (err) {
       console.error(err);
+      toast.error(`Failed to save feature: "${err.message}".`);
     } finally {
       setCreatingFeature(false);
+      setLoadingMessage('');
     }
   };
 
@@ -641,8 +690,10 @@ export default function AiSettingsScreen({ setScreen }) {
       setTogglingFeatureId(feature.id);
 
       await toggleFeature(feature);
+      toast.success('Feature status updated successfully');
     } catch (err) {
       console.error(err);
+      toast.error('Failed to update feature status');
     } finally {
       setTogglingFeatureId(null);
       setLoadingMessage('');
@@ -663,6 +714,10 @@ export default function AiSettingsScreen({ setScreen }) {
       setLoadingMessage('Deleting feature...');
 
       await deleteFeature(feature.id);
+      toast.success(`Feature "${feature.feature_name}" deleted successfully`);
+    } catch (err) {
+      console.error(err);
+      toast.error('Failed to delete feature');
     } finally {
       setDeletingFeatureId(null);
       setLoadingMessage('');
@@ -827,11 +882,11 @@ export default function AiSettingsScreen({ setScreen }) {
         </div>
 
         <div className="px-8 py-7 space-y-6">
-          {error && (
+          {/* {error && (
             <div className="rounded-2xl border border-red-200 bg-red-50 px-5 py-4 text-sm font-semibold text-red-700">
               {error}
             </div>
-          )}
+          )} */}
 
           {activeTab === 'identify' && (
             <div className="space-y-6 animate-fadeIn">
@@ -1857,12 +1912,6 @@ export default function AiSettingsScreen({ setScreen }) {
                                         : 'Index'}
                                   </button>
                                 )}
-
-                                {/* {isComingSoonDocument(doc) && (
-                                  <span className="rounded-full bg-amber-50 px-3 py-1 text-[11px] font-black text-amber-700">
-                                    Indexing Soon
-                                  </span>
-                                )} */}
 
                                 <button
                                   type="button"

@@ -1,6 +1,6 @@
-import { useEffect, useMemo, useState } from "react";
-
-import Topbar from "../components/layout/Topbar";
+import { useEffect, useMemo, useState } from 'react';
+import toast from 'react-hot-toast';
+import Topbar from '../components/layout/Topbar';
 
 import {
   Bot,
@@ -8,31 +8,34 @@ import {
   Globe2,
   MessageCircle,
   Sparkles,
-} from "../lib/icons";
+} from '../lib/icons';
 
-import useCreateChatbot from "../hooks/useCreateChatbot";
+import useCreateChatbot from '../hooks/useCreateChatbot';
 
-const SELECTED_AGENT_TEMPLATE_KEY = "nexora_selected_agent_template";
+const SELECTED_AGENT_TEMPLATE_KEY = 'nexora_selected_agent_template';
 
 const getSelectedAgentTemplate = () => {
   try {
     const raw = localStorage.getItem(SELECTED_AGENT_TEMPLATE_KEY);
     return raw ? JSON.parse(raw) : null;
   } catch (err) {
-    console.error("[CreateChatbotScreen] Failed to parse selected template:", err);
+    console.error(
+      '[CreateChatbotScreen] Failed to parse selected template:',
+      err,
+    );
     return null;
   }
 };
 
 const getTemplateBotDescription = (template) => {
-  if (!template) return "";
+  if (!template) return '';
 
   if (template.defaultPrompt) {
     return template.defaultPrompt;
   }
 
-  return `${template.templateName || "AI Agent"} for ${
-    template.categoryName || "business automation"
+  return `${template.templateName || 'AI Agent'} for ${
+    template.categoryName || 'business automation'
   }.`;
 };
 
@@ -44,22 +47,22 @@ export default function CreateChatbotScreen({ setScreen }) {
   const [selectedTemplate, setSelectedTemplate] = useState(null);
 
   const [form, setForm] = useState({
-    name: "",
-    description: "",
+    name: '',
+    description: '',
   });
 
-  const [successMessage, setSuccessMessage] = useState("");
+  const [successMessage, setSuccessMessage] = useState('');
 
   useEffect(() => {
     try {
       const template = getSelectedAgentTemplate();
 
       const rawChannel = sessionStorage.getItem(
-        "nexora_create_chatbot_channel"
+        'nexora_create_chatbot_channel',
       );
 
       const rawUsecase = sessionStorage.getItem(
-        "nexora_create_chatbot_usecase"
+        'nexora_create_chatbot_usecase',
       );
 
       const channel = rawChannel ? JSON.parse(rawChannel) : null;
@@ -70,13 +73,13 @@ export default function CreateChatbotScreen({ setScreen }) {
         (template
           ? {
               channelType:
-                template.recommendedChannel === "whatsapp"
-                  ? "whatsapp"
-                  : "website",
+                template.recommendedChannel === 'whatsapp'
+                  ? 'whatsapp'
+                  : 'website',
               channelName:
-                template.recommendedChannel === "whatsapp"
-                  ? "WhatsApp"
-                  : "Website Widget",
+                template.recommendedChannel === 'whatsapp'
+                  ? 'WhatsApp'
+                  : 'Website Widget',
             }
           : null);
 
@@ -84,21 +87,21 @@ export default function CreateChatbotScreen({ setScreen }) {
         usecase ||
         (template
           ? {
-              useCase: template.templateSlug || "agent-template",
-              useCaseName: template.templateName || "Agent Template",
-              botType: template.templateSlug || "custom_agent",
-              defaultBotName: template.templateName || "New AI Agent",
+              useCase: template.templateSlug || 'agent-template',
+              useCaseName: template.templateName || 'Agent Template',
+              botType: template.templateSlug || 'custom_agent',
+              defaultBotName: template.templateName || 'New AI Agent',
               description: getTemplateBotDescription(template),
             }
           : null);
 
       if (!resolvedChannel?.channelType) {
-        setScreen("platform");
+        setScreen('platform');
         return;
       }
 
       if (!resolvedUsecase?.useCase) {
-        setScreen("usecase");
+        setScreen('usecase');
         return;
       }
 
@@ -110,20 +113,18 @@ export default function CreateChatbotScreen({ setScreen }) {
         name:
           template?.templateName ||
           resolvedUsecase.defaultBotName ||
-          "New Chatbot",
+          'New Chatbot',
         description:
-          template?.defaultPrompt ||
-          resolvedUsecase.description ||
-          "",
+          template?.defaultPrompt || resolvedUsecase.description || '',
       });
     } catch (err) {
-      console.error("[CreateChatbotScreen] init error:", err);
-      setScreen("platform");
+      console.error('[CreateChatbotScreen] init error:', err);
+      setScreen('platform');
     }
   }, [setScreen]);
 
   const channelIcon = useMemo(() => {
-    if (selectedChannel?.channelType === "whatsapp") {
+    if (selectedChannel?.channelType === 'whatsapp') {
       return MessageCircle;
     }
 
@@ -132,26 +133,27 @@ export default function CreateChatbotScreen({ setScreen }) {
 
   const ChannelIcon = channelIcon;
 
-  const templateFeaturesCount = selectedTemplate?.enabledFeatureIds?.length || 0;
+  const templateFeaturesCount =
+    selectedTemplate?.enabledFeatureIds?.length || 0;
 
   const behaviorConfig = selectedTemplate?.defaultBehaviorConfig || {};
 
   const behaviorConfigPreview = [
     {
-      label: "Agent Role",
-      value: behaviorConfig.agent_role || "-",
+      label: 'Agent Role',
+      value: behaviorConfig.agent_role || '-',
     },
     {
-      label: "Department",
-      value: behaviorConfig.department || "-",
+      label: 'Department',
+      value: behaviorConfig.department || '-',
     },
     {
-      label: "Knowledge Mode",
-      value: behaviorConfig.knowledge_mode || "-",
+      label: 'Knowledge Mode',
+      value: behaviorConfig.knowledge_mode || '-',
     },
     {
-      label: "Response Style",
-      value: behaviorConfig.response_style || "-",
+      label: 'Response Style',
+      value: behaviorConfig.response_style || '-',
     },
   ];
 
@@ -168,14 +170,14 @@ export default function CreateChatbotScreen({ setScreen }) {
         botType:
           selectedTemplate?.templateSlug ||
           selectedUsecase.botType ||
-          "custom_agent",
+          'custom_agent',
 
         channelType: selectedChannel.channelType,
 
         useCase:
           selectedTemplate?.templateSlug ||
           selectedUsecase.useCase ||
-          "agent-template",
+          'agent-template',
 
         templateId: selectedTemplate?.templateId || null,
         templateSlug: selectedTemplate?.templateSlug || null,
@@ -185,8 +187,8 @@ export default function CreateChatbotScreen({ setScreen }) {
         defaultPrompt: selectedTemplate?.defaultPrompt || null,
         defaultRoleDescription:
           selectedTemplate?.defaultRoleDescription || null,
-        defaultTone: selectedTemplate?.defaultTone || "professional",
-        defaultLanguage: selectedTemplate?.defaultLanguage || "id",
+        defaultTone: selectedTemplate?.defaultTone || 'professional',
+        defaultLanguage: selectedTemplate?.defaultLanguage || 'id',
         defaultGreetingMessage:
           selectedTemplate?.defaultGreetingMessage || null,
         defaultFallbackMessage:
@@ -197,17 +199,18 @@ export default function CreateChatbotScreen({ setScreen }) {
         enabledFeatureIds: selectedTemplate?.enabledFeatureIds || [],
       });
 
-      sessionStorage.removeItem("nexora_create_chatbot_channel");
-      sessionStorage.removeItem("nexora_create_chatbot_usecase");
+      sessionStorage.removeItem('nexora_create_chatbot_channel');
+      sessionStorage.removeItem('nexora_create_chatbot_usecase');
       localStorage.removeItem(SELECTED_AGENT_TEMPLATE_KEY);
 
-      setSuccessMessage("Chatbot created successfully.");
+      toast.success('Chatbot berhasil dibuat');
 
       setTimeout(() => {
-        setScreen("flows");
+        setScreen('flows');
       }, 900);
     } catch (err) {
-      console.error("[CreateChatbotScreen] create error:", err);
+      console.error('[CreateChatbotScreen] create error:', err);
+      toast.error(err.message || 'Gagal membuat chatbot');
     }
   };
 
@@ -238,19 +241,19 @@ export default function CreateChatbotScreen({ setScreen }) {
             type="button"
             onClick={() =>
               selectedTemplate
-                ? setScreen("agent-marketplace")
-                : setScreen("usecase")
+                ? setScreen('agent-marketplace')
+                : setScreen('usecase')
             }
             className="h-11 w-fit px-5 rounded-2xl border border-slate-200 bg-white text-sm font-bold text-slate-700 shadow-sm hover:bg-slate-50 transition"
           >
-            {selectedTemplate ? "Back to Marketplace" : "Back to Use Case"}
+            {selectedTemplate ? 'Back to Marketplace' : 'Back to Use Case'}
           </button>
         </section>
 
         {selectedTemplate && (
           <div className="rounded-2xl border border-blue-200 bg-blue-50 px-5 py-4 text-sm text-blue-800">
-            <span className="font-black">Template selected:</span>{" "}
-            {selectedTemplate.templateName}{" "}
+            <span className="font-black">Template selected:</span>{' '}
+            {selectedTemplate.templateName}{' '}
             <span className="text-blue-500">
               ({selectedTemplate.categoryName})
             </span>
@@ -263,11 +266,11 @@ export default function CreateChatbotScreen({ setScreen }) {
           </div>
         )}
 
-        {successMessage && (
+        {/* {successMessage && (
           <div className="rounded-2xl border border-emerald-200 bg-emerald-50 px-5 py-4 text-sm font-semibold text-emerald-700">
             {successMessage}
           </div>
-        )}
+        )} */}
 
         <section className="grid grid-cols-1 xl:grid-cols-[minmax(0,1fr)_420px] gap-6 items-start">
           <form
@@ -341,7 +344,7 @@ export default function CreateChatbotScreen({ setScreen }) {
                     </div>
 
                     <span className="rounded-full bg-blue-50 px-3 py-1 text-xs font-black text-blue-700">
-                      {selectedTemplate.categoryName || "Template"}
+                      {selectedTemplate.categoryName || 'Template'}
                     </span>
                   </div>
 
@@ -351,7 +354,7 @@ export default function CreateChatbotScreen({ setScreen }) {
                         Role
                       </p>
                       <p className="mt-2 font-black text-slate-900">
-                        {selectedTemplate.defaultRoleDescription || "-"}
+                        {selectedTemplate.defaultRoleDescription || '-'}
                       </p>
                     </div>
 
@@ -360,7 +363,7 @@ export default function CreateChatbotScreen({ setScreen }) {
                         Tone
                       </p>
                       <p className="mt-2 font-black text-slate-900">
-                        {selectedTemplate.defaultTone || "-"}
+                        {selectedTemplate.defaultTone || '-'}
                       </p>
                     </div>
 
@@ -369,7 +372,7 @@ export default function CreateChatbotScreen({ setScreen }) {
                         Language
                       </p>
                       <p className="mt-2 font-black text-slate-900">
-                        {selectedTemplate.defaultLanguage || "-"}
+                        {selectedTemplate.defaultLanguage || '-'}
                       </p>
                     </div>
 
@@ -379,7 +382,7 @@ export default function CreateChatbotScreen({ setScreen }) {
                       </p>
                       <p className="mt-2 font-black text-slate-900">
                         {templateFeaturesCount} feature
-                        {templateFeaturesCount === 1 ? "" : "s"}
+                        {templateFeaturesCount === 1 ? '' : 's'}
                       </p>
                     </div>
                   </div>
@@ -416,12 +419,12 @@ export default function CreateChatbotScreen({ setScreen }) {
                 className="h-12 px-6 rounded-2xl bg-blue-600 text-white text-sm font-black shadow-sm hover:bg-blue-700 disabled:opacity-60 disabled:cursor-not-allowed flex items-center gap-2 transition"
               >
                 <Sparkles size={17} />
-                {loading ? "Creating Chatbot..." : "Create Chatbot"}
+                {loading ? 'Creating Chatbot...' : 'Create Chatbot'}
               </button>
 
               <button
                 type="button"
-                onClick={() => setScreen("home")}
+                onClick={() => setScreen('home')}
                 className="h-12 px-6 rounded-2xl border border-slate-200 bg-white text-sm font-bold text-slate-700 hover:bg-slate-50 transition"
               >
                 Cancel
@@ -452,7 +455,7 @@ export default function CreateChatbotScreen({ setScreen }) {
                     Channel
                   </p>
                   <p className="mt-1 text-sm font-black text-slate-950">
-                    {selectedChannel?.channelName || "-"}
+                    {selectedChannel?.channelName || '-'}
                   </p>
                 </div>
 
@@ -463,12 +466,12 @@ export default function CreateChatbotScreen({ setScreen }) {
                   <p className="mt-1 text-sm font-black text-slate-950">
                     {selectedTemplate?.templateName ||
                       selectedUsecase?.useCaseName ||
-                      "-"}
+                      '-'}
                   </p>
                   <p className="mt-2 text-xs leading-5 text-slate-500">
                     {selectedUsecase?.description ||
                       selectedTemplate?.defaultRoleDescription ||
-                      ""}
+                      ''}
                   </p>
                 </div>
 
@@ -483,7 +486,7 @@ export default function CreateChatbotScreen({ setScreen }) {
                     </p>
 
                     <p className="mt-1 text-xs text-slate-600">
-                      Category: {selectedTemplate.categoryName || "-"}
+                      Category: {selectedTemplate.categoryName || '-'}
                     </p>
 
                     <p className="mt-1 text-xs text-slate-600">
@@ -501,14 +504,14 @@ export default function CreateChatbotScreen({ setScreen }) {
 
               <div className="mt-4 space-y-3">
                 {[
-                  "Bot record",
-                  "Default flow",
-                  "Starter nodes and edges",
-                  "Channel configuration",
-                  "Widget settings",
-                  "AI settings",
-                  "Structured behavior config",
-                  "Selected bot features",
+                  'Bot record',
+                  'Default flow',
+                  'Starter nodes and edges',
+                  'Channel configuration',
+                  'Widget settings',
+                  'AI settings',
+                  'Structured behavior config',
+                  'Selected bot features',
                 ].map((item) => (
                   <div
                     key={item}
