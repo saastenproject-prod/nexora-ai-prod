@@ -7,7 +7,7 @@ export default function Sidebar({ active, setActive }) {
         <span className="text-white font-black text-lg">S</span>
       </div> */}
 
-      <div className="h-11 w-11 grid place-items-center overflow-hidden">
+      <div className="h-11 w-11 grid place-items-center rounded-2xl shadow-sm overflow-hidden">
         <img
           src="../../saia-64.png"
           alt="Logo"
