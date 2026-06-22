@@ -93,8 +93,12 @@ export default function HomeScreen({ setScreen, onLogout }) {
       <div className="sticky top-0 z-20 border-b border-slate-200/80 bg-white/85 backdrop-blur-xl">
         <div className="max-w-7xl mx-auto h-16 px-8 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-2xl bg-slate-950 grid place-items-center shadow-sm">
-              <span className="text-white font-black">N</span>
+            <div className="h-10 w-10 rounded-2xl overflow-hidden shadow-md">
+              <img
+                src="../../saia-64.png"
+                alt="Saia"
+                className="h-full w-full object-cover"
+              />
             </div>
 
             <div>

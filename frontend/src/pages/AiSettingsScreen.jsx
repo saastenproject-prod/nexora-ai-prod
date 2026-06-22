@@ -848,7 +848,7 @@ export default function AiSettingsScreen({ setScreen }) {
 
         <div className="sticky top-16 z-20 border-b border-slate-200 bg-white/85 backdrop-blur-xl px-8 flex gap-6">
           {[
-            { id: 'identify', label: 'AI Identify', icon: Bot },
+            { id: 'identify', label: 'AI Identity', icon: Bot },
             { id: 'behavior', label: 'Behavior', icon: BrainCircuit },
             { id: 'instructions', label: 'Instructions', icon: Pencil },
             {
