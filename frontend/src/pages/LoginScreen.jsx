@@ -70,17 +70,17 @@ export default function LoginScreen({ onLoginSuccess }) {
           onSubmit={handleLogin}
           className="w-full max-w-md rounded-[2rem] border border-slate-200 bg-white p-8 shadow-sm"
         >
-          <div className="h-12 w-12 rounded-2xl bg-slate-950 text-white grid place-items-center font-black">
-            N
+          <div className="mb-8 flex flex-col items-center text-center">
+            <img src="/saia-512.png" alt="Saia" className="h-32 w-32" />
+
+            <h2 className="mt-2 text-3xl font-black text-slate-950">
+              Sign in to Saia
+            </h2>
+
+            <p className="mt-2 text-sm leading-6 text-slate-500">
+              Login using your Supabase Auth account to access your workspace.
+            </p>
           </div>
-
-          <h2 className="mt-6 text-3xl font-black text-slate-950">
-            Sign in to Saia
-          </h2>
-
-          <p className="mt-2 text-sm leading-6 text-slate-500">
-            Login using your Supabase Auth account to access your workspace.
-          </p>
 
           {error && (
             <div className="mt-5 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-700">

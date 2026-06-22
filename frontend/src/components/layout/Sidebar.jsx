@@ -9,7 +9,7 @@ export default function Sidebar({ active, setActive }) {
 
       <div className="h-11 w-11 grid place-items-center overflow-hidden">
         <img
-          src="../../saiav2.png"
+          src="../../saia-64.png"
           alt="Logo"
           className="h-11 w-11 rounded-xl object-cover"
         />
