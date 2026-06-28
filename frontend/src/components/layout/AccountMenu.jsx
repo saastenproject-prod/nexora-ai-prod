@@ -57,9 +57,7 @@ export default function AccountMenu({ workspaceName, onLogout }) {
 
         <ChevronDown
           size={15}
-          className={`text-slate-400 transition ${
-            open ? "rotate-180" : ""
-          }`}
+          className={`text-slate-400 transition ${open ? "rotate-180" : ""}`}
         />
       </button>
 

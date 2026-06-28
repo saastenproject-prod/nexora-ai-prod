@@ -12,79 +12,79 @@ import {
   AlertTriangle,
   Clock3,
   Smile,
-} from '../lib/icons';
+} from "../lib/icons";
 
-import { APP_NAME } from '../data/dummyData';
-import useDashboardData from '../hooks/useDashboardData';
-import AccountMenu from '../components/layout/AccountMenu';
+import { APP_NAME } from "../data/dummyData";
+import useDashboardData from "../hooks/useDashboardData";
+import AccountMenu from "../components/layout/AccountMenu";
 
 export default function HomeScreen({ setScreen, onLogout }) {
-  const { loading, error, workspace, activeBot, stats, refetch } =
+  const { loading, error, workspace, activeBot, stats, user, refetch } =
     useDashboardData();
 
   const dashboardCards = [
     {
-      label: 'Total Bots',
-      value: loading ? '...' : stats.totalBots,
-      note: loading ? 'Loading...' : `${stats.activeBots} active`,
+      label: "Total Bots",
+      value: loading ? "..." : stats.totalBots,
+      note: loading ? "Loading..." : `${stats.activeBots} active`,
       icon: Bot,
     },
     {
-      label: 'Conversations',
-      value: loading ? '...' : stats.conversations,
-      note: 'Total conversations',
+      label: "Conversations",
+      value: loading ? "..." : stats.conversations,
+      note: "Total conversations",
       icon: MessageCircle,
     },
     {
-      label: 'Automation Rate',
-      value: loading ? '...' : `${stats.botHandledMessages}%`,
-      note: 'Handled by bot',
+      label: "Automation Rate",
+      value: loading ? "..." : `${stats.botHandledMessages}%`,
+      note: "Handled by bot",
       icon: BrainCircuit,
     },
     {
-      label: 'Need Response',
-      value: loading ? '...' : stats.needResponse,
-      note: 'Open / assigned inbox',
+      label: "Need Response",
+      value: loading ? "..." : stats.needResponse,
+      note: "Open / assigned inbox",
       icon: Inbox,
     },
     {
-      label: 'Failed Response',
-      value: loading ? '...' : stats.failedResponses,
-      note: 'Unsolved by bot',
+      label: "Failed Response",
+      value: loading ? "..." : stats.failedResponses,
+      note: "Unsolved by bot",
       icon: AlertTriangle,
     },
     {
-      label: 'Average Response Time',
-      value: loading ? '...' : stats.averageResponseTime,
-      note: 'Response time',
+      label: "Average Response Time",
+      value: loading ? "..." : stats.averageResponseTime,
+      note: "Response time",
       icon: Clock3,
     },
     {
-      label: 'User Satisfaction',
-      value: loading ? '...' : `${stats.userSatisfaction}%`,
-      note: 'User satisfaction score',
+      label: "User Satisfaction",
+      value: loading ? "..." : `${stats.userSatisfaction}%`,
+      note: "User satisfaction score",
       icon: Smile,
     },
   ];
 
   const recentFlows = [
     {
-      name: 'Answer Customer Queries',
-      channel: 'Website / WhatsApp',
-      status: 'Published',
-      nodes: '7 nodes',
+      name: "Answer Customer Queries",
+      channel: "Website / WhatsApp",
+      status: "Published",
+      nodes: "7 nodes",
     },
     {
-      name: 'Lead Qualification',
-      channel: 'Website',
-      status: 'Draft',
-      nodes: '9 nodes',
+      name: "Lead Qualification",
+      channel: "Website",
+      status: "Draft",
+      nodes: "9 nodes",
     },
     {
-      name: 'WhatsApp Support Intake',
-      channel: 'WhatsApp',
-      status: 'Published',
-      nodes: '11 nodes',
+      name: "WhatsApp Support Intake",
+      channel: "WhatsApp",
+      status: "Published",
+      nodes: "11 nodes",
     },
   ];
 
@@ -135,7 +135,8 @@ export default function HomeScreen({ setScreen, onLogout }) {
             <div className="h-1.5 w-40 rounded-full bg-gradient-to-r from-cyan-500 via-blue-600 to-orange-500 mb-5" />
 
             <p className="text-sm font-bold text-blue-700">
-              Welcome back, Sadayana!
+              Welcome back,{" "}
+              {user?.email.length ? user?.email.split("@")[0] : "Anonymous"}!
             </p>
 
             <h1 className="mt-2 text-4xl font-black tracking-tight text-slate-950">
@@ -157,7 +158,7 @@ export default function HomeScreen({ setScreen, onLogout }) {
             </button>
 
             <button
-              onClick={() => setScreen('agent-marketplace')}
+              onClick={() => setScreen("agent-marketplace")}
               className="h-11 px-5 rounded-2xl bg-blue-600 text-white text-sm font-bold shadow-sm hover:bg-blue-700 transition flex items-center gap-2"
             >
               <Plus size={17} /> Create Chatbot

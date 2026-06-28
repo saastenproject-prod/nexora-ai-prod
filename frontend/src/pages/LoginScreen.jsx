@@ -1,18 +1,18 @@
-import { useState } from 'react';
-import { supabase } from '../lib/supabaseClient';
-import { BrainCircuit } from '../lib/icons';
+import { useState } from "react";
+import { supabase } from "../lib/supabaseClient";
+import { BrainCircuit } from "../lib/icons";
 
 export default function LoginScreen({ onLoginSuccess }) {
-  const [email, setEmail] = useState('admin@nexora.ai');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState("admin@nexora.ai");
+  const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
 
   const handleLogin = async (event) => {
     event.preventDefault();
 
     setLoading(true);
-    setError('');
+    setError("");
 
     try {
       const { data, error: loginError } =
@@ -26,7 +26,7 @@ export default function LoginScreen({ onLoginSuccess }) {
       onLoginSuccess?.(data.session);
     } catch (err) {
       console.error(err);
-      setError(err.message || 'Login failed.');
+      setError(err.message || "Login failed.");
     } finally {
       setLoading(false);
     }
@@ -40,7 +40,7 @@ export default function LoginScreen({ onLoginSuccess }) {
         <div className="relative max-w-xl text-white">
           <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-4 py-2 text-sm text-blue-50">
             <BrainCircuit size={16} />
-            Sadayana AI Studio
+            Agent Studio
           </div>
 
           <h1 className="mt-7 text-5xl font-black tracking-tight leading-tight">
@@ -53,7 +53,7 @@ export default function LoginScreen({ onLoginSuccess }) {
           </p>
 
           <div className="mt-8 grid grid-cols-3 gap-3">
-            {['Bot Builder', 'Inbox', 'AI Knowledge'].map((item) => (
+            {["Bot Builder", "Inbox", "AI Knowledge"].map((item) => (
               <div
                 key={item}
                 className="rounded-2xl border border-white/15 bg-white/10 p-4 text-sm font-bold text-blue-50"
@@ -120,7 +120,7 @@ export default function LoginScreen({ onLoginSuccess }) {
             disabled={loading || !email || !password}
             className="mt-6 h-12 w-full rounded-2xl bg-blue-600 text-white text-sm font-black shadow-sm disabled:opacity-60 disabled:cursor-not-allowed"
           >
-            {loading ? 'Signing in...' : 'Sign In'}
+            {loading ? "Signing in..." : "Sign In"}
           </button>
 
           {/* <p className="mt-5 text-center text-xs text-slate-400">
